@@ -6,3 +6,6 @@ build/*
 # osx noise
 .DS_Store
 profile
+
+SoccerGame.xcodeproj/xcuserdata/*.*
+SoccerGame.xcodeproj/project.xcworkspace/xcuserdata/

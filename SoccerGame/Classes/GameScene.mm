@@ -8,8 +8,12 @@
 // -----------------------------------------------------------------------
 
 #import "GameScene.h"
+#import "Strings.h"
 #import "IntroScene.h"
 #import "Box2D.h"
+#import "Box2DNode.h"
+#import "ActorsFactory.h"
+#import "PhysicsFactory.h"
 
 #pragma mark - GameScene
 
@@ -31,7 +35,6 @@
 
 - (id)init
 {
-    b2World *world = new b2World(b2Vec2(0,-10));
     // Apple recommend assigning self with supers return value
     self = [super init];
     if (!self) return(nil);
@@ -39,18 +42,33 @@
     // Enable touch handling on scene node
     self.userInteractionEnabled = YES;
     
-    // Create a colored background (Dark Grey)
-    CCNodeColor *background = [CCNodeColor nodeWithColor:[CCColor colorWithRed:0.2f green:0.2f blue:0.2f alpha:1.0f]];
+    // Create a colored background
+    CCNodeColor *background = [CCNodeColor nodeWithColor:[CCColor colorWithRed:0.2f green:0.7f blue:0.2f alpha:1.0f]];
     [self addChild:background];
     
-    // Add a sprite
-    _sprite = [CCSprite spriteWithImageNamed:@"Icon-72.png"];
-    _sprite.position  = ccp(self.contentSize.width/2,self.contentSize.height/2);
-    [self addChild:_sprite];
+    // Cocos2d "display values"
+    CGSize viewSize = [[CCDirector sharedDirector] viewSizeInPixels];
+    float contentScaleFactor = [CCDirector sharedDirector].contentScaleFactor;
+
+    // how many meters wide we want to display (in box2d meters, since my arbitrary set box2d world scale is 1 unit == 1 meter)
+    float visibleSceneWidth = 20;
+    float viewScale = viewSize.width/(visibleSceneWidth*contentScaleFactor);
     
-    // Animate sprite with action
-    CCActionRotateBy* actionSpin = [CCActionRotateBy actionWithDuration:1.5f angle:360];
-    [_sprite runAction:[CCActionRepeatForever actionWithAction:actionSpin]];
+    // set up physics enabling node
+    b2Vec2 gravity(0,-10);
+    Box2DNode *box2DNode = [[Box2DNode alloc] initWithGravity:gravity];
+    box2DNode.scale = viewScale;
+    [self addChild:box2DNode];
+    
+    
+    CCNode *ball = [ActorsFactory createBallWithImage:sprite_ball_soccer
+                                               radius:0.5f
+                                             position:CGPointMake(10,5)
+                                           andDensity:1.0f
+                                        withBox2DNode:box2DNode];
+    [box2DNode addChild:ball];
+    
+    [PhysicsFactory createGroundBoxWithSize:CGSizeMake(10,0.1) andPosition:CGPointMake(10,1) withBox2DNode:box2DNode];
     
     // Create a back button
     CCButton *backButton = [CCButton buttonWithTitle:@"[ Menu ]" fontName:@"Verdana-Bold" fontSize:18.0f];
@@ -116,7 +134,7 @@
 {
     // back to intro scene with transition
     [[CCDirector sharedDirector] replaceScene:[IntroScene scene]
-                               withTransition:[CCTransition transitionPushWithDirection:CCTransitionDirectionRight duration:1.0f]];
+                               withTransition:[CCTransition transitionPushWithDirection:CCTransitionDirectionRight duration:0.2f]];
 }
 
 // -----------------------------------------------------------------------

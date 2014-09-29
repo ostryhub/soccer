@@ -16,5 +16,6 @@ static NSString *btn_menu_1_player_pushed = @"Button_1Player_down.png";
 
 #pragma mark - Gameplay
 
+static NSString *sprite_ball_soccer = @"ball_soccer.png";
 
 #endif
