@@ -23,13 +23,6 @@
 #pragma mark - GameScene
 
 @implementation GameScene
-{
-    CCSprite *_sprite;
-}
-
-// -----------------------------------------------------------------------
-#pragma mark - Create & Destroy
-// -----------------------------------------------------------------------
 
 + (GameScene *)scene
 {
@@ -51,39 +44,8 @@
     CCNodeColor *background = [CCNodeColor nodeWithColor:[CCColor colorWithRed:0.2f green:0.7f blue:0.2f alpha:1.0f]];
     [self addChild:background];
     
-    // Cocos2d "display values"
-    CGSize viewSize = [[CCDirector sharedDirector] viewSizeInPixels];
-    float contentScaleFactor = [CCDirector sharedDirector].contentScaleFactor;
-
-    // how many meters wide we want to display (in box2d meters, since my arbitrary set box2d world scale is 1 unit == 1 meter)
-    float visibleSceneWidth = 10;
-    float viewScale = viewSize.width/(visibleSceneWidth*contentScaleFactor);
-    
-    // set up physics node
-    b2Vec2 gravity(0,-10);
-    Box2DNode *box2DNode = [[Box2DNode alloc] initWithGravity:gravity];
-    box2DNode.scale = viewScale;
-    [self addChild:box2DNode];
-    
-    // Create ground
-    [PhysicsFactory createGroundBoxWithSize:CGSizeMake(30,0.2) andPosition:CGPointMake(5,1) withBox2DNode:box2DNode];
-    
-    // Init actors
-    self.ball = [[BallActor alloc] initWithPosition:CGPointMake(5,7) radius:0.25f andBox2DNode:box2DNode];
-    
-    static CGSize playerSize = CGSizeMake(.8,2);
-    self.playerKeeperA = [[PlayerActor alloc] initWithPosition:CGPointMake(2,3) size:playerSize team:TeamA andBox2DNode:box2DNode];
-    self.playerStrikerA = [[PlayerActor alloc] initWithPosition:CGPointMake(2.5,3) size:playerSize team:TeamA andBox2DNode:box2DNode];
-    self.playerKeeperB = [[PlayerActor alloc] initWithPosition:CGPointMake(8,3) size:playerSize team:TeamB andBox2DNode:box2DNode];
-    self.playerStrikerB = [[PlayerActor alloc] initWithPosition:CGPointMake(7.5,3) size:playerSize team:TeamB andBox2DNode:box2DNode];
-    
-    // Add actors to box2DNode so that they can be prompted to update their logic
-    [box2DNode addActor:self.ball];
-    [box2DNode addActor:self.playerKeeperA];
-    [box2DNode addActor:self.playerStrikerA];
-    [box2DNode addActor:self.playerKeeperB];
-    [box2DNode addActor:self.playerStrikerB];
-    
+    // Start match
+    [self startNewMatch];
     
     ///////////////////////////////////////////////////////////////////////////////////
     // UI CONTROLS
@@ -104,26 +66,205 @@
                              disabledSpriteFrame:btn_1player_up];
     
     kickButton.positionType = CCPositionTypeNormalized;
-    kickButton.position = ccp(0.8f, 0.25f);
+    kickButton.position = ccp(0.9f, 0.1f);
     [kickButton setTouchBeganTarget:self selector:@selector(onKickBegan:)];
     [kickButton setTouchEndedTarget:self selector:@selector(onKickEnded:)];
     [self addChild:kickButton];
-
 
     // done
 	return self;
 }
 
-// -----------------------------------------------------------------------
-
-- (void)dealloc
-{
-    // clean up code goes here
+- (NSString *)getScoreText {
+    return [NSString stringWithFormat:@"%d - %d", self.scoreTeamA, self.scoreTeamB];
 }
 
-// -----------------------------------------------------------------------
-#pragma mark - Enter & Exit
-// -----------------------------------------------------------------------
+- (void)startNewMatch {
+    self.gameState = GameState_Play;
+    
+    if (self.box2DNode)
+        [self removeChild:self.box2DNode];
+    
+    if (self.ball)
+        [self.ball.ball.parent removeChild:self.ball.ball];
+    
+    // Physics Soccer
+    CCLabelTTF *labelScore = [CCLabelTTF labelWithString:[self getScoreText] fontName:@"ArialBlack" fontSize:40.0f];
+    labelScore.positionType = CCPositionTypeNormalized;
+    labelScore.color = [CCColor whiteColor];
+    labelScore.position = ccp(0.5f, 0.8f);
+    [self addChild:labelScore];
+    
+    // Cocos2d "display values"
+    CGSize viewSize = [[CCDirector sharedDirector] viewSizeInPixels];
+    float contentScaleFactor = [CCDirector sharedDirector].contentScaleFactor;
+    
+    // how many meters wide we want to display (in box2d meters, since my arbitrary set box2d world scale is 1 unit == 1 meter)
+    float visibleSceneWidth = 10;
+    float viewScale = viewSize.width/(visibleSceneWidth*contentScaleFactor);
+    
+    // set up physics node
+    b2Vec2 gravity(0,-8);
+    self.box2DNode = [[Box2DNode alloc] initWithGravity:gravity];
+    self.box2DNode.scale = viewScale;
+    [self addChild:self.box2DNode];
+    
+    // Create ground
+    [PhysicsFactory createGroundBoxWithSize:CGSizeMake(30,0.5) andPosition:CGPointMake(5,1) withBox2DNode:self.box2DNode];
+    
+    // Init Ball
+    self.ball = [[BallActor alloc] initWithPosition:CGPointMake(5,7) radius:0.25f andBox2DNode:self.box2DNode];
+    
+    // Init Players
+    static CGSize playerSize = CGSizeMake(.8,1.6);
+
+    self.playerKeeperA = [[PlayerActor alloc] initWithPosition:CGPointMake(2.8,3.5) size:playerSize team:TeamA andBox2DNode:self.box2DNode];
+    self.playerStrikerA = [[PlayerActor alloc] initWithPosition:CGPointMake(4.0,3.5) size:playerSize team:TeamA andBox2DNode:self.box2DNode];
+    self.playerKeeperB = [[PlayerActor alloc] initWithPosition:CGPointMake(7.2,3) size:playerSize team:TeamB andBox2DNode:self.box2DNode];
+    self.playerStrikerB = [[PlayerActor alloc] initWithPosition:CGPointMake(6,3.5) size:playerSize team:TeamB andBox2DNode:self.box2DNode];
+
+    // Create goal A
+    [PhysicsFactory createGroundBoxWithSize:CGSizeMake(0.1,3) andPosition:CGPointMake(0.55, 2.75) withBox2DNode:self.box2DNode];
+    [PhysicsFactory createGroundBoxWithSize:CGSizeMake(1.3,0.1) andPosition:CGPointMake(1.15, 4.2) withBox2DNode:self.box2DNode];
+    CCSprite *goalA = [CCSprite spriteWithImageNamed:sprite_goal];
+    goalA.anchorPoint = CGPointMake(0.5, 0.5);
+    goalA.scaleX = -1.3/goalA.contentSize.width;
+    goalA.scaleY = 3.0/goalA.contentSize.height;
+    goalA.position = CGPointMake(1.15,2.75);
+    [self.box2DNode addChild:goalA];
+    
+    // Create goal B
+    [PhysicsFactory createGroundBoxWithSize:CGSizeMake(0.1,3) andPosition:CGPointMake(9.45, 2.75) withBox2DNode:self.box2DNode];
+    [PhysicsFactory createGroundBoxWithSize:CGSizeMake(1.3,0.1) andPosition:CGPointMake(8.85, 4.2) withBox2DNode:self.box2DNode];
+    CCSprite *goalB = [CCSprite spriteWithImageNamed:sprite_goal];
+    goalB.anchorPoint = CGPointMake(0.5, 0.5);
+    goalB.scaleX = 1.3/goalA.contentSize.width;
+    goalB.scaleY = 3.0/goalA.contentSize.height;
+    goalB.position = CGPointMake(8.85,2.75);
+    [self.box2DNode addChild:goalB];
+    [PhysicsFactory createGroundBoxWithSize:CGSizeMake(0.1,3) andPosition:CGPointMake(0.55, 2.75) withBox2DNode:self.box2DNode];
+    [PhysicsFactory createGroundBoxWithSize:CGSizeMake(1.3,0.1) andPosition:CGPointMake(1.15, 4.2) withBox2DNode:self.box2DNode];
+
+    // Add actors to box2DNode so that they can be prompted to update their logic
+    [self.box2DNode addActor:self.ball];
+    [self.box2DNode addActor:self.playerKeeperA];
+    [self.box2DNode addActor:self.playerStrikerA];
+    [self.box2DNode addActor:self.playerKeeperB];
+    [self.box2DNode addActor:self.playerStrikerB];
+}
+
+- (void)goal {
+    if (self.gameState != GameState_Play)
+        return;
+    
+    self.gameState = GameState_Goal;
+    
+    if (self.box2DNode)
+        self.box2DNode.slowRate = 4;
+    
+    self.goalNode = [[CCNode alloc] init];
+    self.goalNode.anchorPoint = CGPointMake(0.5, 0.5);
+    self.goalNode.contentSize = self.contentSize;
+    self.goalNode.positionType = CCPositionTypeNormalized;
+    self.goalNode.position = CGPointMake(0.5, 2);
+    
+    // Create a colored background
+    CCNodeColor *background = [CCNodeColor nodeWithColor:[CCColor colorWithRed:0.8f green:0.8f blue:0.8f alpha:0.2f]];
+    [self.goalNode addChild:background];
+
+    CCLabelTTF *labelGoal = [CCLabelTTF labelWithString:@"!!! GOAL !!!" fontName:@"ArialBlack" fontSize:60.0f];
+    labelGoal.positionType = CCPositionTypeNormalized;
+    labelGoal.color = [CCColor whiteColor];
+    labelGoal.position = ccp(0.5f, 0.7f);
+    [self.goalNode addChild:labelGoal];
+
+    CCButton *btnNextMatch = [CCButton buttonWithTitle:@"Next match" fontName:@"ArialBlack" fontSize:60.0f];
+    btnNextMatch.positionType = CCPositionTypeNormalized;
+    btnNextMatch.position = ccp(0.5f, 0.25f);
+    [btnNextMatch setTarget:self selector:@selector(onNextMatch)];
+    [self.goalNode addChild:btnNextMatch];
+    
+    [self addChild:self.goalNode];
+    [self.goalNode runAction:[CCActionMoveTo actionWithDuration:1.0f position:CGPointMake(0.5,0.5)]];
+}
+
+- (void)ballOut {
+    if (self.gameState != GameState_Play)
+        return;
+    
+    self.gameState = GameState_BallOut;
+    
+    if (self.box2DNode)
+        self.box2DNode.slowRate = 4;
+    
+    self.goalNode = [[CCNode alloc] init];
+    self.goalNode.anchorPoint = CGPointMake(0.5, 0.5);
+    self.goalNode.contentSize = self.contentSize;
+    self.goalNode.positionType = CCPositionTypeNormalized;
+    self.goalNode.position = CGPointMake(0.5, 2);
+    
+    // Create a colored background
+    CCNodeColor *background = [CCNodeColor nodeWithColor:[CCColor colorWithRed:0.8f green:0.8f blue:0.8f alpha:0.2f]];
+    [self.goalNode addChild:background];
+    
+    CCLabelTTF *labelGoal = [CCLabelTTF labelWithString:@"BALL OUT" fontName:@"ArialBlack" fontSize:60.0f];
+    labelGoal.positionType = CCPositionTypeNormalized;
+    labelGoal.color = [CCColor whiteColor];
+    labelGoal.position = ccp(0.5f, 0.7f);
+    [self.goalNode addChild:labelGoal];
+    
+    CCButton *btnNextMatch = [CCButton buttonWithTitle:@"Next match" fontName:@"ArialBlack" fontSize:60.0f];
+    btnNextMatch.positionType = CCPositionTypeNormalized;
+    btnNextMatch.position = ccp(0.5f, 0.25f);
+    [btnNextMatch setTarget:self selector:@selector(onNextMatch)];
+    [self.goalNode addChild:btnNextMatch];
+    
+    [self addChild:self.goalNode];
+    [self.goalNode runAction:[CCActionMoveTo actionWithDuration:1.0f position:CGPointMake(0.5,0.5)]];
+}
+
+- (void)update:(CCTime)delta {
+    
+    switch(self.gameState)
+    {
+        case GameState_Play:
+            if (self.ball)
+            {
+                CGPoint p = self.ball.ball.position;
+                if (p.x<1.5 && p.x>0.5 && p.y<4.25)
+                {
+                    self.scoreTeamB++;
+                    self.ball = nil;
+                    [self goal];
+                }
+                else if (p.x>8.5 && p.x<9.5 && p.y<4.25)
+                {
+                    self.scoreTeamA++;
+                    self.ball = nil;
+                    [self goal];
+                }
+                else if (p.x<0 || p.x>10)
+                {
+                    self.ball = nil;
+                    [self ballOut];
+                }
+            }
+            break;
+            
+        default:
+        case GameState_Goal:
+        case GameState_BallOut:
+            break;
+    }
+}
+
+- (void)dealloc {
+    self.ball = nil;
+    self.playerKeeperA = nil;
+    self.playerStrikerA = nil;
+    self.playerKeeperB = nil;
+    self.playerStrikerB = nil;
+}
 
 - (void)onEnter
 {
@@ -133,10 +274,7 @@
     // In pre-v3, touch enable and scheduleUpdate was called here
     // In v3, touch is enabled by setting userInterActionEnabled for the individual nodes
     // Per frame update is automatically enabled, if update is overridden
-    
 }
-
-// -----------------------------------------------------------------------
 
 - (void)onExit
 {
@@ -162,7 +300,6 @@
     
     [self.playerStrikerA startKick];
     [self.playerKeeperA startKick];
-
     
     [self.playerStrikerB jumpInDirection:[self.ball getPosition]];
     [self.playerKeeperB jumpInDirection:[self.ball getPosition]];
@@ -178,6 +315,11 @@
     
     [self.playerStrikerB stopKick];
     [self.playerKeeperB stopKick];
+}
+
+- (void)onNextMatch {
+    [self removeChild:self.goalNode];
+    [self startNewMatch];
 }
 
 // -----------------------------------------------------------------------

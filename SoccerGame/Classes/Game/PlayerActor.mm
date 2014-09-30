@@ -13,6 +13,9 @@
 
 #define ARC4RANDOM_MAX 0x100000000
 
+const static float _standUpFrequency = 2.0f;
+const static float _standUpDamping = 1.0f;
+
 @implementation PlayerActor {
     unsigned int _id;
 }
@@ -43,26 +46,18 @@ static unsigned int idCounter;
     switch(self.team)
     {
         case TeamA:
-            self.legAJoint->EnableMotor(true);
-            self.legAJoint->SetMaxMotorTorque(10);
             self.legAJoint->SetMotorSpeed(10);
-            
-            self.legBJoint->EnableMotor(true);
-            self.legBJoint->SetMaxMotorTorque(10);
             self.legBJoint->SetMotorSpeed(10);
+            self.chestBody->ApplyAngularImpulse(-0.4, true);
             break;
 
         case TeamB:
-            self.legAJoint->EnableMotor(true);
-            self.legAJoint->SetMaxMotorTorque(10);
             self.legAJoint->SetMotorSpeed(-10);
-            
-            self.legBJoint->EnableMotor(true);
-            self.legBJoint->SetMaxMotorTorque(10);
             self.legBJoint->SetMotorSpeed(-10);
+            self.chestBody->ApplyAngularImpulse(0.4, true);
             break;
     }
-    self.standJoint->SetFrequency(1);
+    self.standJoint->SetFrequency(0.01);
 }
 
 - (void)stopKick {
@@ -74,36 +69,61 @@ static unsigned int idCounter;
     self.legBJoint->SetMaxMotorTorque(10);
     self.legBJoint->SetMotorSpeed(-10);
     
-    self.standJoint->SetFrequency(4);
+    self.standJoint->SetFrequency(_standUpFrequency);
 }
 
 - (void)jumpInDirection:(CGPoint)point {
     if (!self.jumpingEnabled)
-        return;
+    {
+        NSLog(@"Player %d didnt jump", _id);
+                return;
+    }
+    
+    CGPoint totalImpulse = CGPointMake(0,0);
     
     CGPoint dir = point;
-    dir.x -= self.weightBody->GetPosition().x;
-    dir.y -= self.weightBody->GetPosition().y;
-    
+    dir.x -= self.chestBody->GetPosition().x;
+    dir.y -= self.chestBody->GetPosition().y;
+
+    // Impulse into direction of specified point (should be ball)
     float len = sqrtf(dir.x*dir.x + dir.y*dir.y);
-    dir.x /= len;
-    dir.y /= len;
-    
-    float impulseValueMax = 3;
-    float impulseValueMin = 1.5;
-    float impulseValue = ((double)arc4random() / ARC4RANDOM_MAX) * (impulseValueMax - impulseValueMin) + impulseValueMin;
+    if (len<3)
+    {
+        dir.x /= len;
+        dir.y /= len;
 
-    float angleNoiseRange = 20 * M_PI/180;
-    float angleNoise = ((double)arc4random() / ARC4RANDOM_MAX) * angleNoiseRange + angleNoiseRange/2;
-    
-    float angle = self.weightBody->GetAngle()+angleNoise;
-    CGPoint impulse = CGPointMake(dir.x*impulseValue, dir.y*impulseValue);
+        float angleNoiseRange = 30 * M_PI/180;
+        float angleNoise = ((double)arc4random() / ARC4RANDOM_MAX) * angleNoiseRange - angleNoiseRange/2;
+        dir = CGPointApplyAffineTransform(dir, CGAffineTransformMakeRotation(angleNoise));
 
-    impulse = CGPointApplyAffineTransform(impulse, CGAffineTransformMakeRotation(angle));
-    impulse.y += impulseValue*1.3; // make sure we also jump apwards
+        float impulseValueMax = 9;
+        float impulseValueMin = 6;
+        float impulseValue = ((double)arc4random() / ARC4RANDOM_MAX) * (impulseValueMax - impulseValueMin) + impulseValueMin;
+
+        CGPoint impulse = CGPointMake(dir.x*impulseValue, dir.y*impulseValue);
+        totalImpulse.x += impulse.x;
+        totalImpulse.y += impulse.y;
+    }
+
+    // Impulse into direction of player orientation
+    {
+        float angleNoiseRange = 0 * M_PI/180;
+        float angleNoise = ((double)arc4random() / ARC4RANDOM_MAX) * angleNoiseRange - angleNoiseRange/2;
+        float angle = self.chestBody->GetAngle()+angleNoise;
+
+        float impulseValueMax = 7;
+        float impulseValueMin = 5;
+        float impulseValue = ((double)arc4random() / ARC4RANDOM_MAX) * (impulseValueMax - impulseValueMin) + impulseValueMin;
+        
+        CGPoint impulse = CGPointApplyAffineTransform(CGPointMake(0, impulseValue), CGAffineTransformMakeRotation(angle));
+        totalImpulse.x += impulse.x;
+        totalImpulse.y += impulse.y;
+    }
     
-    b2Vec2 b2impulse(impulse.x, impulse.y);
-    self.chestBody->ApplyLinearImpulse(b2impulse,  self.weightBody->GetPosition(), true);
+    totalImpulse.x /= 2.0;
+    totalImpulse.y /= 2.0;
+
+    self.weightBody->ApplyLinearImpulse(b2Vec2(totalImpulse.x, totalImpulse.y),  self.weightBody->GetPosition(), true);
 }
 
 - (void)createRagdollAtPosition:(CGPoint)position size:(CGSize)size forTeam:(Team)team {
@@ -208,22 +228,22 @@ static unsigned int idCounter;
     CGPoint head_chest_anchor = CGPointMake(position.x, position.y+leg_a_size.height+chest_size.height);
     NSMutableDictionary *head_chest_joint_opts = [PhysicsFactory getDefaultRevoluteJointOptions];
     head_chest_joint_opts[@"enableLimit"] = [NSNumber numberWithBool:YES];
-    head_chest_joint_opts[@"lowerAngle"] = [NSNumber numberWithFloat:-5 *M_PI/180];
-    head_chest_joint_opts[@"upperAngle"] = [NSNumber numberWithFloat:5 *M_PI/180];
+    head_chest_joint_opts[@"lowerAngle"] = [NSNumber numberWithFloat:-7 *M_PI/180];
+    head_chest_joint_opts[@"upperAngle"] = [NSNumber numberWithFloat:7 *M_PI/180];
+    [PhysicsFactory createRevoluteJointBetweenBodyA:head_body
+                                           andBodyB:chest_body
+                                      atWorldAnchor:head_chest_anchor
+                                        withOptions:head_chest_joint_opts
+                                      withBox2DNode:self.box2DNode];
 
-    b2Joint *joint = [PhysicsFactory createRevoluteJointBetweenBodyA:head_body
-                                                            andBodyB:chest_body
-                                                       atWorldAnchor:head_chest_anchor
-                                                         withOptions:head_chest_joint_opts
-                                                       withBox2DNode:self.box2DNode];
-    
     // legA - chest
     CGPoint leg_a_chest_anchor = CGPointMake(position.x-leg_a_size.width/2, position.y+leg_a_size.height);
     NSMutableDictionary *leg_a_chest_joint_opts = [PhysicsFactory getDefaultRevoluteJointOptions];
     leg_a_chest_joint_opts[@"enableLimit"] = [NSNumber numberWithBool:YES];
-    leg_a_chest_joint_opts[@"lowerAngle"] = [NSNumber numberWithFloat:-90 *M_PI/180];
+    leg_a_chest_joint_opts[@"lowerAngle"] = [NSNumber numberWithFloat:-100 *M_PI/180];
     leg_a_chest_joint_opts[@"upperAngle"] = [NSNumber numberWithFloat:0];
-    
+    leg_a_chest_joint_opts[@"enableMotor"] = [NSNumber numberWithBool:YES];
+    leg_a_chest_joint_opts[@"maxMotorTorque"] = [NSNumber numberWithFloat:10];
     self.legAJoint = [PhysicsFactory createRevoluteJointBetweenBodyA:leg_a_body
                                                             andBodyB:chest_body
                                                        atWorldAnchor:leg_a_chest_anchor
@@ -235,7 +255,9 @@ static unsigned int idCounter;
     NSMutableDictionary *leg_b_chest_joint_opts = [PhysicsFactory getDefaultRevoluteJointOptions];
     leg_b_chest_joint_opts[@"enableLimit"] = [NSNumber numberWithBool:YES];
     leg_b_chest_joint_opts[@"lowerAngle"] = [NSNumber numberWithFloat:0];
-    leg_b_chest_joint_opts[@"upperAngle"] = [NSNumber numberWithFloat:90 *M_PI/180];
+    leg_b_chest_joint_opts[@"upperAngle"] = [NSNumber numberWithFloat:100 *M_PI/180];
+    leg_b_chest_joint_opts[@"enableMotor"] = [NSNumber numberWithBool:YES];
+    leg_b_chest_joint_opts[@"maxMotorTorque"] = [NSNumber numberWithFloat:10];
     self.legBJoint = [PhysicsFactory createRevoluteJointBetweenBodyA:leg_b_body
                                                             andBodyB:chest_body
                                                        atWorldAnchor:leg_b_chest_anchor
@@ -245,23 +267,18 @@ static unsigned int idCounter;
     // weight - chest
     CGPoint weight_chest_anchor = CGPointMake(position.x, position.y);
     NSMutableDictionary *weight_chest_joint_opts = [PhysicsFactory getDefaultRevoluteJointOptions];
-    weight_chest_joint_opts[@"enableLimit"] = [NSNumber numberWithBool:NO];
-    weight_chest_joint_opts[@"lowerAngle"] = [NSNumber numberWithFloat:-90 *M_PI/180];
-    weight_chest_joint_opts[@"upperAngle"] = [NSNumber numberWithFloat:90 *M_PI/180];
-    weight_chest_joint_opts[@"enableMotor"] = [NSNumber numberWithBool:NO];
-    weight_chest_joint_opts[@"maxMotorTorque"] = [NSNumber numberWithFloat:-10];
-    weight_chest_joint_opts[@"motorSpeed"] = [NSNumber numberWithFloat:-2];
-    self.weightChestJoint = [PhysicsFactory createRevoluteJointBetweenBodyA:chest_body
-                                                                   andBodyB:self.weightBody
-                                                              atWorldAnchor:weight_chest_anchor
-                                                                withOptions:weight_chest_joint_opts
-                                                              withBox2DNode:self.box2DNode];
-    
+    [PhysicsFactory createRevoluteJointBetweenBodyA:chest_body
+                                           andBodyB:self.weightBody
+                                      atWorldAnchor:weight_chest_anchor
+                                        withOptions:weight_chest_joint_opts
+                                      withBox2DNode:self.box2DNode];
+
     b2DistanceJointDef jointDef;
-    b2Vec2 jointPos(position.x, position.y-h*2);
+    b2Vec2 jointPos(position.x + (self.team==TeamA?1:-1)*w, position.y+h*3);
     jointDef.Initialize(self.chestBody, self.weightBody, b2Vec2(chest_pos.x, chest_pos.y), jointPos);
-    jointDef.frequencyHz = 4;
-    jointDef.dampingRatio = 2;
+    jointDef.length = jointDef.length*0.9; // so that there is a bit more tension constantly
+    jointDef.frequencyHz = _standUpFrequency;
+    jointDef.dampingRatio = _standUpDamping;
     self.standJoint = (b2DistanceJoint*)self.box2DNode.world->CreateJoint(&jointDef);
     
     //////////////////////////////////////////////////////////////////////////////
@@ -279,7 +296,7 @@ static unsigned int idCounter;
     // legs
     filter.groupIndex = -_id;
     filter.categoryBits = 0x01 << FILTER_LEG;
-    filter.maskBits = ~(0x00);
+    filter.maskBits = ~(0x00);      // collide with all
     [PhysicsFactory setBody:leg_a_body filterData:filter];
     [PhysicsFactory setBody:leg_b_body filterData:filter];
     

@@ -26,7 +26,6 @@ typedef enum _Team : NSUInteger {
 
 @property (nonatomic) b2RevoluteJoint *legAJoint;
 @property (nonatomic) b2RevoluteJoint *legBJoint;
-@property (nonatomic) b2RevoluteJoint *weightChestJoint;
 @property (nonatomic) b2DistanceJoint *standJoint;
 @property (nonatomic) b2Body *weightBody;
 @property (nonatomic) b2Body *chestBody;

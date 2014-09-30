@@ -15,7 +15,7 @@
 #define FILTER_LEG              1
 #define FILTER_HEAD_AND_CHEST   2
 #define FILTER_BALL             3
-#define FILTER_GOAL             4
+
 
 @interface PhysicsFactory : NSObject
 

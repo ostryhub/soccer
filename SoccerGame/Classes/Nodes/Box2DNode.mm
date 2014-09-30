@@ -15,6 +15,8 @@
 - (id)initWithGravity:(b2Vec2 &)gravity {
     if (self=[super init])
     {
+        self.slowRate = 1;
+        
         self.world = new b2World(gravity);
         self.actors = [NSMutableArray arrayWithArray:@[]];
     }
@@ -26,7 +28,7 @@
 
     // Better physics accuracy to run twice with half step rather than once with double step
     for(int i=0; i<2; ++i)
-        self.world->Step(1.0/120.0, 4, 7);
+        self.world->Step(1.0/(120*_slowRate), 4, 7);
     
     for(b2Body* b=self.world->GetBodyList(); b; b=b->GetNext())
     {
@@ -46,6 +48,11 @@
 }
 
 - (void)dealloc {
+    [self.actors removeAllObjects];
+    
+    for(b2Body* b=self.world->GetBodyList(); b; b=b->GetNext())
+        self.world->DestroyBody(b);
+    
     delete self.world;
 }
 

@@ -24,8 +24,8 @@
 }
 
 - (void)createBallAtPosition:(CGPoint)position andRadius:(float)radius {
-    self.ballBody = [PhysicsFactory createBallOfRadius:radius position:position andDensity:0.1 withBox2DNode:self.box2DNode];
-    self.ballBody->SetLinearDamping(2);
+    self.ballBody = [PhysicsFactory createBallOfRadius:radius position:position andDensity:1.25 withBox2DNode:self.box2DNode];
+    self.ballBody->SetLinearDamping(1);
     
     self.ball = [CCSprite spriteWithImageNamed:sprite_ball_soccer];
     self.ball.scaleX = radius*2/self.ball.contentSize.width;

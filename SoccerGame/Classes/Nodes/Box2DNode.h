@@ -19,11 +19,11 @@
 @interface Box2DNode : CCNode
 
 @property (nonatomic) b2World* world;
+@property (nonatomic) float slowRate; // default 1 - natural 60 fps, the more the slower animation
+
 @property (strong, nonatomic) NSMutableArray* actors;
 
 - (id)initWithGravity:(b2Vec2 &)gravity;
-- (void)dealloc;
-
 - (void)addActor:(Actor*)actor;
 
 @end

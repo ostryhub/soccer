@@ -58,15 +58,15 @@
     // OnePlayerButton scene button
     CCSpriteFrame *btn_1player_up = [CCSpriteFrame frameWithImageNamed: btn_menu_1_player_normal ];
     CCSpriteFrame *btn_1player_down = [CCSpriteFrame frameWithImageNamed: btn_menu_1_player_pushed];
-    CCButton *helloWorldButton = [CCButton buttonWithTitle:@""
+    CCButton *btn_player_1 = [CCButton buttonWithTitle:@""
                                                spriteFrame:btn_1player_up
                                     highlightedSpriteFrame:btn_1player_down
                                        disabledSpriteFrame:btn_1player_up];
     
-    helloWorldButton.positionType = CCPositionTypeNormalized;
-    helloWorldButton.position = ccp(0.4f, 0.25f);
-    [helloWorldButton setTarget:self selector:@selector(onSpinningClicked:)];
-    [self addChild:helloWorldButton];
+    btn_player_1.positionType = CCPositionTypeNormalized;
+    btn_player_1.position = ccp(0.4f, 0.25f);
+    [btn_player_1 setTarget:self selector:@selector(onSpinningClicked:)];
+    [self addChild:btn_player_1];
 
     // done
 	return self;
