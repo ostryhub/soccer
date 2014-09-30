@@ -13,10 +13,22 @@
 
 // -----------------------------------------------------------------------
 
+@class BallActor;
+@class PlayerActor;
+
 /**
  *  The main scene
  */
 @interface GameScene : CCScene
+
+@property (strong, nonatomic) BallActor *ball;
+
+@property (strong, nonatomic) PlayerActor *playerKeeperA;
+@property (strong, nonatomic) PlayerActor *playerStrikerA;
+
+@property (strong, nonatomic) PlayerActor *playerKeeperB;
+@property (strong, nonatomic) PlayerActor *playerStrikerB;
+
 
 // -----------------------------------------------------------------------
 

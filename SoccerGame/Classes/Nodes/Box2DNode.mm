@@ -7,6 +7,7 @@
 //
 
 #import "Box2DNode.h"
+#import "Actor.h"
 #import "cocos2d.h"
 
 @implementation Box2DNode
@@ -15,6 +16,7 @@
     if (self=[super init])
     {
         self.world = new b2World(gravity);
+        self.actors = [NSMutableArray arrayWithArray:@[]];
     }
     
     return self;
@@ -38,10 +40,17 @@
             node.rotation = -angle*180/M_PI;
         }
     }
+    
+    for(Actor *actor in self.actors)
+        [actor logic];
 }
 
 - (void)dealloc {
     delete self.world;
+}
+
+- (void)addActor:(Actor*)actor {
+    [self.actors addObject:actor];
 }
 
 @end

@@ -277,7 +277,11 @@
 		8452C2F519D9BF0100F39B50 /* Box2DNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8452C2F419D9BF0100F39B50 /* Box2DNode.mm */; };
 		8452C2F819D9C23D00F39B50 /* PhysicsFactory.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8452C2F719D9C23D00F39B50 /* PhysicsFactory.mm */; };
 		8452C2FB19D9CAF900F39B50 /* ball_soccer.png in Resources */ = {isa = PBXBuildFile; fileRef = 8452C2FA19D9CAF900F39B50 /* ball_soccer.png */; };
-		8452C2FE19D9CF2A00F39B50 /* ActorsFactory.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8452C2FD19D9CF2A00F39B50 /* ActorsFactory.mm */; };
+		8452C30119DA0FA300F39B50 /* PlayerActor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8452C30019DA0FA300F39B50 /* PlayerActor.mm */; };
+		8452C30419DA10C000F39B50 /* Actor.m in Sources */ = {isa = PBXBuildFile; fileRef = 8452C30319DA10C000F39B50 /* Actor.m */; };
+		8452C30719DAC25600F39B50 /* BallActor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8452C30619DAC25600F39B50 /* BallActor.mm */; };
+		8452C30D19DAEF0D00F39B50 /* Button.m in Sources */ = {isa = PBXBuildFile; fileRef = 8452C30C19DAEF0D00F39B50 /* Button.m */; };
+		8452C31019DB000D00F39B50 /* Game.m in Sources */ = {isa = PBXBuildFile; fileRef = 8452C30F19DB000D00F39B50 /* Game.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -835,8 +839,16 @@
 		8452C2F619D9C23D00F39B50 /* PhysicsFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PhysicsFactory.h; path = Classes/Game/PhysicsFactory.h; sourceTree = "<group>"; };
 		8452C2F719D9C23D00F39B50 /* PhysicsFactory.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = PhysicsFactory.mm; path = Classes/Game/PhysicsFactory.mm; sourceTree = "<group>"; };
 		8452C2FA19D9CAF900F39B50 /* ball_soccer.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ball_soccer.png; sourceTree = "<group>"; };
-		8452C2FC19D9CF2A00F39B50 /* ActorsFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ActorsFactory.h; path = Classes/Game/ActorsFactory.h; sourceTree = "<group>"; };
-		8452C2FD19D9CF2A00F39B50 /* ActorsFactory.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ActorsFactory.mm; path = Classes/Game/ActorsFactory.mm; sourceTree = "<group>"; };
+		8452C2FF19DA0FA300F39B50 /* PlayerActor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlayerActor.h; path = Classes/Game/PlayerActor.h; sourceTree = "<group>"; };
+		8452C30019DA0FA300F39B50 /* PlayerActor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = PlayerActor.mm; path = Classes/Game/PlayerActor.mm; sourceTree = "<group>"; };
+		8452C30219DA10C000F39B50 /* Actor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Actor.h; path = Classes/Game/Actor.h; sourceTree = "<group>"; };
+		8452C30319DA10C000F39B50 /* Actor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Actor.m; path = Classes/Game/Actor.m; sourceTree = "<group>"; };
+		8452C30519DAC25600F39B50 /* BallActor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BallActor.h; path = Classes/Game/BallActor.h; sourceTree = "<group>"; };
+		8452C30619DAC25600F39B50 /* BallActor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = BallActor.mm; path = Classes/Game/BallActor.mm; sourceTree = "<group>"; };
+		8452C30B19DAEF0D00F39B50 /* Button.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Button.h; path = Classes/Nodes/Button.h; sourceTree = "<group>"; };
+		8452C30C19DAEF0D00F39B50 /* Button.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Button.m; path = Classes/Nodes/Button.m; sourceTree = "<group>"; };
+		8452C30E19DB000D00F39B50 /* Game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Game.h; path = Classes/Game/Game.h; sourceTree = "<group>"; };
+		8452C30F19DB000D00F39B50 /* Game.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Game.m; path = Classes/Game/Game.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1778,6 +1790,8 @@
 			children = (
 				8452C2F319D9BF0100F39B50 /* Box2DNode.h */,
 				8452C2F419D9BF0100F39B50 /* Box2DNode.mm */,
+				8452C30B19DAEF0D00F39B50 /* Button.h */,
+				8452C30C19DAEF0D00F39B50 /* Button.m */,
 			);
 			name = Nodes;
 			sourceTree = "<group>";
@@ -1785,10 +1799,16 @@
 		8452C2F919D9C24200F39B50 /* Game */ = {
 			isa = PBXGroup;
 			children = (
+				8452C30E19DB000D00F39B50 /* Game.h */,
+				8452C30F19DB000D00F39B50 /* Game.m */,
 				8452C2F619D9C23D00F39B50 /* PhysicsFactory.h */,
 				8452C2F719D9C23D00F39B50 /* PhysicsFactory.mm */,
-				8452C2FC19D9CF2A00F39B50 /* ActorsFactory.h */,
-				8452C2FD19D9CF2A00F39B50 /* ActorsFactory.mm */,
+				8452C2FF19DA0FA300F39B50 /* PlayerActor.h */,
+				8452C30019DA0FA300F39B50 /* PlayerActor.mm */,
+				8452C30219DA10C000F39B50 /* Actor.h */,
+				8452C30319DA10C000F39B50 /* Actor.m */,
+				8452C30519DAC25600F39B50 /* BallActor.h */,
+				8452C30619DAC25600F39B50 /* BallActor.mm */,
 			);
 			name = Game;
 			sourceTree = "<group>";
@@ -1948,6 +1968,7 @@
 				8452C2E319D9B65B00F39B50 /* b2PolygonAndCircleContact.cpp in Sources */,
 				8452C2DB19D9B65B00F39B50 /* b2WorldCallbacks.cpp in Sources */,
 				8452BD3B19D9A32C00F39B50 /* NSMutableDictionary+WeakReferences.m in Sources */,
+				8452C30D19DAEF0D00F39B50 /* Button.m in Sources */,
 				8452C22719D9A80E00F39B50 /* CCTextureCache.m in Sources */,
 				8452C2CB19D9B65B00F39B50 /* b2TimeOfImpact.cpp in Sources */,
 				8452C24119D9A80E00F39B50 /* TGAlib.m in Sources */,
@@ -1976,6 +1997,7 @@
 				8452C22219D9A80E00F39B50 /* CCSprite9Slice.m in Sources */,
 				8452BCFA19D9A32C00F39B50 /* OALAudioTrack.m in Sources */,
 				8452BD8019D9A32D00F39B50 /* plane.c in Sources */,
+				8452C30719DAC25600F39B50 /* BallActor.mm in Sources */,
 				8452C24419D9A80E00F39B50 /* CCAnimationManager.m in Sources */,
 				8452C21C19D9A80E00F39B50 /* CCResponder.m in Sources */,
 				8452C1EB19D9A80E00F39B50 /* CCActionInstant.m in Sources */,
@@ -2008,6 +2030,7 @@
 				8452C22C19D9A80E00F39B50 /* CCTMXXMLParser.m in Sources */,
 				8452C1F019D9A80E00F39B50 /* CCAnimation.m in Sources */,
 				8452C20A19D9A80E00F39B50 /* CCLayoutBox.m in Sources */,
+				8452C30119DA0FA300F39B50 /* PlayerActor.mm in Sources */,
 				8452C23019D9A80E00F39B50 /* CCDirectorIOS.m in Sources */,
 				8452C21719D9A80E00F39B50 /* CCPhysicsNode.m in Sources */,
 				8452BE1E19D9A32D00F39B50 /* GameScene.mm in Sources */,
@@ -2030,7 +2053,9 @@
 				8452C20319D9A80E00F39B50 /* CCEffectSaturation.m in Sources */,
 				8452C23D19D9A80E00F39B50 /* CCVertex.m in Sources */,
 				8452BD8819D9A32D00F39B50 /* vec2.c in Sources */,
+				8452C30419DA10C000F39B50 /* Actor.m in Sources */,
 				8452C2EB19D9B65B00F39B50 /* b2PrismaticJoint.cpp in Sources */,
+				8452C31019DB000D00F39B50 /* Game.m in Sources */,
 				8452C2EC19D9B65B00F39B50 /* b2PulleyJoint.cpp in Sources */,
 				8452C24B19D9A80E00F39B50 /* CCButton.m in Sources */,
 				8452BD8419D9A32D00F39B50 /* ray2.c in Sources */,
@@ -2040,7 +2065,6 @@
 				8452C2C919D9B65B00F39B50 /* b2Distance.cpp in Sources */,
 				8452C2E119D9B65B00F39B50 /* b2EdgeAndCircleContact.cpp in Sources */,
 				8452C21819D9A80E00F39B50 /* CCPhysicsShape.m in Sources */,
-				8452C2FE19D9CF2A00F39B50 /* ActorsFactory.mm in Sources */,
 				8452C2DA19D9B65B00F39B50 /* b2World.cpp in Sources */,
 				8452C1F619D9A80E00F39B50 /* CCDrawNode.m in Sources */,
 				8452C23519D9A80E00F39B50 /* CCGLView.m in Sources */,

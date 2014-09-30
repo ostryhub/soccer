@@ -39,7 +39,7 @@
     CCNodeColor *background = [CCNodeColor nodeWithColor:[CCColor colorWithRed:0.0f green:1.0f blue:0.1f alpha:1.0f]];
     [self addChild:background];
     
-    // Hello world
+    // Physics Soccer
     CCLabelTTF *label = [CCLabelTTF labelWithString:@"SOCCER\nPHYSICS" fontName:@"ArialBlack" fontSize:60.0f];
     label.positionType = CCPositionTypeNormalized;
     label.color = [CCColor whiteColor];
@@ -55,7 +55,7 @@
     
     [label runAction:[CCActionRepeatForever actionWithAction:actionSequence]];
     
-    // Helloworld scene button
+    // OnePlayerButton scene button
     CCSpriteFrame *btn_1player_up = [CCSpriteFrame frameWithImageNamed: btn_menu_1_player_normal ];
     CCSpriteFrame *btn_1player_down = [CCSpriteFrame frameWithImageNamed: btn_menu_1_player_pushed];
     CCButton *helloWorldButton = [CCButton buttonWithTitle:@""
@@ -64,7 +64,7 @@
                                        disabledSpriteFrame:btn_1player_up];
     
     helloWorldButton.positionType = CCPositionTypeNormalized;
-    helloWorldButton.position = ccp(0.2f, 0.25f);
+    helloWorldButton.position = ccp(0.4f, 0.25f);
     [helloWorldButton setTarget:self selector:@selector(onSpinningClicked:)];
     [self addChild:helloWorldButton];
 

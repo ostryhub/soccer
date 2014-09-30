@@ -8,12 +8,17 @@
 // -----------------------------------------------------------------------
 
 #import "GameScene.h"
-#import "Strings.h"
 #import "IntroScene.h"
+#import "Button.h"
+
+#import "Strings.h"
+
 #import "Box2D.h"
 #import "Box2DNode.h"
-#import "ActorsFactory.h"
+
 #import "PhysicsFactory.h"
+#import "BallActor.h"
+#import "PlayerActor.h"
 
 #pragma mark - GameScene
 
@@ -51,24 +56,37 @@
     float contentScaleFactor = [CCDirector sharedDirector].contentScaleFactor;
 
     // how many meters wide we want to display (in box2d meters, since my arbitrary set box2d world scale is 1 unit == 1 meter)
-    float visibleSceneWidth = 20;
+    float visibleSceneWidth = 10;
     float viewScale = viewSize.width/(visibleSceneWidth*contentScaleFactor);
     
-    // set up physics enabling node
+    // set up physics node
     b2Vec2 gravity(0,-10);
     Box2DNode *box2DNode = [[Box2DNode alloc] initWithGravity:gravity];
     box2DNode.scale = viewScale;
     [self addChild:box2DNode];
     
+    // Create ground
+    [PhysicsFactory createGroundBoxWithSize:CGSizeMake(30,0.2) andPosition:CGPointMake(5,1) withBox2DNode:box2DNode];
     
-    CCNode *ball = [ActorsFactory createBallWithImage:sprite_ball_soccer
-                                               radius:0.5f
-                                             position:CGPointMake(10,5)
-                                           andDensity:1.0f
-                                        withBox2DNode:box2DNode];
-    [box2DNode addChild:ball];
+    // Init actors
+    self.ball = [[BallActor alloc] initWithPosition:CGPointMake(5,7) radius:0.25f andBox2DNode:box2DNode];
     
-    [PhysicsFactory createGroundBoxWithSize:CGSizeMake(10,0.1) andPosition:CGPointMake(10,1) withBox2DNode:box2DNode];
+    static CGSize playerSize = CGSizeMake(.8,2);
+    self.playerKeeperA = [[PlayerActor alloc] initWithPosition:CGPointMake(2,3) size:playerSize team:TeamA andBox2DNode:box2DNode];
+    self.playerStrikerA = [[PlayerActor alloc] initWithPosition:CGPointMake(2.5,3) size:playerSize team:TeamA andBox2DNode:box2DNode];
+    self.playerKeeperB = [[PlayerActor alloc] initWithPosition:CGPointMake(8,3) size:playerSize team:TeamB andBox2DNode:box2DNode];
+    self.playerStrikerB = [[PlayerActor alloc] initWithPosition:CGPointMake(7.5,3) size:playerSize team:TeamB andBox2DNode:box2DNode];
+    
+    // Add actors to box2DNode so that they can be prompted to update their logic
+    [box2DNode addActor:self.ball];
+    [box2DNode addActor:self.playerKeeperA];
+    [box2DNode addActor:self.playerStrikerA];
+    [box2DNode addActor:self.playerKeeperB];
+    [box2DNode addActor:self.playerStrikerB];
+    
+    
+    ///////////////////////////////////////////////////////////////////////////////////
+    // UI CONTROLS
     
     // Create a back button
     CCButton *backButton = [CCButton buttonWithTitle:@"[ Menu ]" fontName:@"Verdana-Bold" fontSize:18.0f];
@@ -76,6 +94,21 @@
     backButton.position = ccp(0.85f, 0.95f); // Top Right of screen
     [backButton setTarget:self selector:@selector(onBackClicked:)];
     [self addChild:backButton];
+    
+    // kickButton scene button
+    CCSpriteFrame *btn_1player_up = [CCSpriteFrame frameWithImageNamed: btn_menu_1_player_normal ];
+    CCSpriteFrame *btn_1player_down = [CCSpriteFrame frameWithImageNamed: btn_menu_1_player_pushed];
+    Button *kickButton = [Button buttonWithTitle:@""
+                                     spriteFrame:btn_1player_up
+                          highlightedSpriteFrame:btn_1player_down
+                             disabledSpriteFrame:btn_1player_up];
+    
+    kickButton.positionType = CCPositionTypeNormalized;
+    kickButton.position = ccp(0.8f, 0.25f);
+    [kickButton setTouchBeganTarget:self selector:@selector(onKickBegan:)];
+    [kickButton setTouchEndedTarget:self selector:@selector(onKickEnded:)];
+    [self addChild:kickButton];
+
 
     // done
 	return self;
@@ -112,21 +145,6 @@
 }
 
 // -----------------------------------------------------------------------
-#pragma mark - Touch Handler
-// -----------------------------------------------------------------------
-
--(void) touchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
-    CGPoint touchLoc = [touch locationInNode:self];
-    
-    // Log touch location
-    CCLOG(@"Move sprite to @ %@",NSStringFromCGPoint(touchLoc));
-    
-    // Move our sprite to touch location
-    CCActionMoveTo *actionMove = [CCActionMoveTo actionWithDuration:1.0f position:touchLoc];
-    [_sprite runAction:actionMove];
-}
-
-// -----------------------------------------------------------------------
 #pragma mark - Button Callbacks
 // -----------------------------------------------------------------------
 
@@ -135,6 +153,31 @@
     // back to intro scene with transition
     [[CCDirector sharedDirector] replaceScene:[IntroScene scene]
                                withTransition:[CCTransition transitionPushWithDirection:CCTransitionDirectionRight duration:0.2f]];
+}
+
+- (void)onKickBegan:(id)sender
+{
+    [self.playerStrikerA jumpInDirection:[self.ball getPosition]];
+    [self.playerKeeperA jumpInDirection:[self.ball getPosition]];
+    
+    [self.playerStrikerA startKick];
+    [self.playerKeeperA startKick];
+
+    
+    [self.playerStrikerB jumpInDirection:[self.ball getPosition]];
+    [self.playerKeeperB jumpInDirection:[self.ball getPosition]];
+
+    [self.playerStrikerB startKick];
+    [self.playerKeeperB startKick];
+}
+
+- (void)onKickEnded:(id)sender
+{
+    [self.playerStrikerA stopKick];
+    [self.playerKeeperA stopKick];
+    
+    [self.playerStrikerB stopKick];
+    [self.playerKeeperB stopKick];
 }
 
 // -----------------------------------------------------------------------

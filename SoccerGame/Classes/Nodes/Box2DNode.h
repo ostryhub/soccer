@@ -9,6 +9,8 @@
 #import "CCNode.h"
 #import "Box2D.h"
 
+@class Actor;
+
 /**
  * Box2DNode is the root physics node of the scene. All physics actors need to be descendants of this node.
  * Bacause Box2D likes objects around ~1m in size this node "active area" is about 10x7.7 units.
@@ -17,8 +19,11 @@
 @interface Box2DNode : CCNode
 
 @property (nonatomic) b2World* world;
+@property (strong, nonatomic) NSMutableArray* actors;
 
 - (id)initWithGravity:(b2Vec2 &)gravity;
 - (void)dealloc;
+
+- (void)addActor:(Actor*)actor;
 
 @end
