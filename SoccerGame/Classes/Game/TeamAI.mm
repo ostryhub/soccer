@@ -9,6 +9,7 @@
 #import "TeamAI.h"
 #import "PlayerActor.h"
 #import "Strings.h"
+#import "Utils.h"
 
 #define BALL_DISTANCE_LIMIT 1.7
 
@@ -47,16 +48,14 @@
         p.y -= _ballPosition.y;
 
         float dist = sqrtf(p.x*p.x+p.y*p.y);
-        NSLog(@"AI dist %f", dist);
         _ballCloseEnough = _ballCloseEnough ? YES : dist<=BALL_DISTANCE_LIMIT;
     }
     
     if (_time>_lastTimeRandomKick+0.5)
     {
         _lastTimeRandomKick = _time;
-        _shouldPerformRandomKick = ((double)arc4random() / ARC4RANDOM_MAX) <.6;
+        _shouldPerformRandomKick = randomf() <.6;
     }
-    NSLog(@"AI should random kick %d", _shouldPerformRandomKick);
 }
 
 - (void)performAIwithDelta:(float)delta andBallPosition:(CGPoint)position {
@@ -64,13 +63,11 @@
     // Gathering Data
     
     _time += delta;
+    _ballPosition = position;
     
     // wait a second before hitting on the ball
     if (_time<1)
         return;
-    
-    _ballPosition = position;
-    NSLog(@"AI time %f", _time);
     
     [self gatherData];
     
@@ -83,9 +80,7 @@
             {
                 _shouldPerformRandomKick = NO;
                 
-                float kickDurationMax = .8;
-                float kickDurationMin = .3;
-                _kickDuration = ((double)arc4random() / ARC4RANDOM_MAX) * (kickDurationMax - kickDurationMin) + kickDurationMin;
+                _kickDuration = randomInRangef(0.3, 0.8);
                 _kickTime = _time;
                 
                 for(PlayerActor *player in self.players)
@@ -104,9 +99,7 @@
                 for(PlayerActor *player in self.players)
                     [player stopKick];
 
-                float noKickDurationMax = .5;
-                float noKickDurationMin = .2;
-                _noKickDuration = ((double)arc4random() / ARC4RANDOM_MAX) * (noKickDurationMax - noKickDurationMin) + noKickDurationMin;
+                _noKickDuration = randomInRangef(0.2, 0.5);
                 _noKickTime = _time;
 
                 self.state = AI_STATE_NOKICK;
@@ -120,7 +113,5 @@
     }
     
 }
-
-
 
 @end

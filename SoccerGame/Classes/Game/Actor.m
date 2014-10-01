@@ -11,7 +11,7 @@
 
 @implementation Actor
 
+// Used for internal actor state update each frame
 - (void)logic {}
-- (void)destroy {}
 
 @end

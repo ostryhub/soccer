@@ -53,12 +53,6 @@
     self.labelScore.position = ccp(0.5f, 0.8f);
     [self addChild:self.labelScore];
     
-    // Start match
-    [self startNewMatch];
-    
-    ///////////////////////////////////////////////////////////////////////////////////
-    // UI CONTROLS
-    
     // Create a back button
     CCButton *backButton = [CCButton buttonWithTitle:@"[ Menu ]" fontName:@"Verdana-Bold" fontSize:18.0f];
     backButton.positionType = CCPositionTypeNormalized;
@@ -80,6 +74,9 @@
     [kickButton setTouchEndedTarget:self selector:@selector(onKickEnded:)];
     [self addChild:kickButton];
 
+    // Start match
+    [self startNewMatch];
+    
     // done
 	return self;
 }
@@ -89,15 +86,11 @@
 }
 
 - (void)startNewMatch {
+    
     self.gameState = GameState_Play;
     
     if (self.box2DNode)
         [self removeChild:self.box2DNode];
-    
-    if (self.ball)
-        [self.ball.ball.parent removeChild:self.ball.ball];
-    
-    self.teamAI = nil;
     
     [self.labelScore setString:[self getScoreText]];
     
@@ -115,20 +108,28 @@
     self.box2DNode.scale = viewScale;
     [self addChild:self.box2DNode];
     
-    // Create ground
-    [PhysicsFactory createGroundBoxWithSize:CGSizeMake(30,0.5) andPosition:CGPointMake(5,1) withBox2DNode:self.box2DNode];
-    
     // Init Ball
     self.ball = [[BallActor alloc] initWithPosition:CGPointMake(5,5) radius:0.25f andBox2DNode:self.box2DNode];
     
     // Init Players
     static CGSize playerSize = CGSizeMake(.8,1.6);
-
     self.playerKeeperA = [[PlayerActor alloc] initWithPosition:CGPointMake(2.8,3.5) size:playerSize team:TeamA andBox2DNode:self.box2DNode];
     self.playerStrikerA = [[PlayerActor alloc] initWithPosition:CGPointMake(4.0,3.5) size:playerSize team:TeamA andBox2DNode:self.box2DNode];
     self.playerKeeperB = [[PlayerActor alloc] initWithPosition:CGPointMake(7.2,3) size:playerSize team:TeamB andBox2DNode:self.box2DNode];
     self.playerStrikerB = [[PlayerActor alloc] initWithPosition:CGPointMake(6,3.5) size:playerSize team:TeamB andBox2DNode:self.box2DNode];
 
+    // Add actors to box2DNode so that they can be prompted to update their logic
+    self.actors = @[self.ball, self.playerKeeperA, self.playerStrikerA, self.playerKeeperB, self.playerStrikerB];
+    
+    // Create AI for tema A
+    self.teamAI = [[TeamAI alloc] initWithPlayers:@[self.playerKeeperA, self.playerStrikerA]];
+
+    // Uncomment this line if you want to see CPU competing with itself
+    //self.teamAI = [[TeamAI alloc] initWithPlayers:@[self.playerKeeperA, self.playerStrikerA, self.playerKeeperB, self.playerStrikerB]];
+
+    // Create ground
+    [PhysicsFactory createGroundBoxWithSize:CGSizeMake(30,0.5) andPosition:CGPointMake(5,1) withBox2DNode:self.box2DNode];
+    
     // Create goal A
     [PhysicsFactory createGroundBoxWithSize:CGSizeMake(0.1,3) andPosition:CGPointMake(0.55, 2.75) withBox2DNode:self.box2DNode];
     [PhysicsFactory createGroundBoxWithSize:CGSizeMake(1.3,0.1) andPosition:CGPointMake(1.15, 4.2) withBox2DNode:self.box2DNode];
@@ -149,16 +150,9 @@
     goalB.position = CGPointMake(8.85,2.75);
     [self.box2DNode addChild:goalB];
 
-    // Add actors to box2DNode so that they can be prompted to update their logic
-    [self.box2DNode addActor:self.ball];
-    [self.box2DNode addActor:self.playerKeeperA];
-    [self.box2DNode addActor:self.playerStrikerA];
-    [self.box2DNode addActor:self.playerKeeperB];
-    [self.box2DNode addActor:self.playerStrikerB];
-    
-    // Create AI for tema A
-    self.teamAI = [[TeamAI alloc] initWithPlayers:@[self.playerKeeperA, self.playerStrikerA]];
 }
+
+#pragma mark - In game middle screens
 
 - (void)goal {
     if (self.gameState != GameState_Play)
@@ -185,7 +179,7 @@
     labelGoal.position = ccp(0.5f, 0.7f);
     [self.goalNode addChild:labelGoal];
 
-    CCButton *btnNextMatch = [CCButton buttonWithTitle:@"Next match" fontName:@"ArialBlack" fontSize:60.0f];
+    CCButton *btnNextMatch = [CCButton buttonWithTitle:@"[ Next match ]" fontName:@"ArialBlack" fontSize:60.0f];
     btnNextMatch.positionType = CCPositionTypeNormalized;
     btnNextMatch.position = ccp(0.5f, 0.25f);
     [btnNextMatch setTarget:self selector:@selector(onNextMatch)];
@@ -220,7 +214,7 @@
     labelGoal.position = ccp(0.5f, 0.7f);
     [self.goalNode addChild:labelGoal];
     
-    CCButton *btnNextMatch = [CCButton buttonWithTitle:@"Next match" fontName:@"ArialBlack" fontSize:60.0f];
+    CCButton *btnNextMatch = [CCButton buttonWithTitle:@"[ Next match ]" fontName:@"ArialBlack" fontSize:60.0f];
     btnNextMatch.positionType = CCPositionTypeNormalized;
     btnNextMatch.position = ccp(0.5f, 0.25f);
     [btnNextMatch setTarget:self selector:@selector(onNextMatch)];
@@ -230,33 +224,40 @@
     [self.goalNode runAction:[CCActionMoveTo actionWithDuration:1.0f position:CGPointMake(0.5,0.5)]];
 }
 
+#pragma mark - Main game "loop"
+
+
 - (void)update:(CCTime)delta {
+    
+    // Update actors logic
+    for(Actor *actor in self.actors)
+        [actor logic];
     
     switch(self.gameState)
     {
         case GameState_Play:
-
             // Ball checks
-            if (self.ball)
+            switch(self.ball.state)
             {
-                CGPoint p = self.ball.ball.position;
-                if (p.x<1.5 && p.x>0.5 && p.y<4.25)
-                {
+                case BallState_InsideGoalA:
                     self.scoreTeamB++;
                     self.ball = nil;
                     [self goal];
-                }
-                else if (p.x>8.5 && p.x<9.5 && p.y<4.25)
-                {
+                    break;
+                    
+                case BallState_InsideGoalB:
                     self.scoreTeamA++;
                     self.ball = nil;
                     [self goal];
-                }
-                else if (p.x<0 || p.x>10)
-                {
+                    break;
+                case BallState_Out:
                     self.ball = nil;
                     [self ballOut];
-                }
+                    break;
+
+                default:
+                case BallState_Play:break;
+
             }
 
             // TeamA AI
@@ -271,33 +272,7 @@
     }
 }
 
-- (void)dealloc {
-    self.ball = nil;
-    self.playerKeeperA = nil;
-    self.playerStrikerA = nil;
-    self.playerKeeperB = nil;
-    self.playerStrikerB = nil;
-}
-
-- (void)onEnter
-{
-    // always call super onEnter first
-    [super onEnter];
-    
-    // In pre-v3, touch enable and scheduleUpdate was called here
-    // In v3, touch is enabled by setting userInterActionEnabled for the individual nodes
-    // Per frame update is automatically enabled, if update is overridden
-}
-
-- (void)onExit
-{
-    // always call super onExit last
-    [super onExit];
-}
-
-// -----------------------------------------------------------------------
-#pragma mark - Button Callbacks
-// -----------------------------------------------------------------------
+#pragma mark - UI Callbacks
 
 - (void)onBackClicked:(id)sender
 {

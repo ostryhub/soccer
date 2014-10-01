@@ -10,7 +10,7 @@
 #import "PhysicsFactory.h"
 #import "Box2D.h"
 #import "Strings.h"
-
+#import "Utils.h"
 
 const static float _standUpFrequency = 2.0f;
 const static float _standUpDamping = 1.0f;
@@ -69,10 +69,7 @@ static unsigned int idCounter;
 
 - (void)jumpInDirection:(CGPoint)point {
     if (!self.jumpingEnabled)
-    {
-        NSLog(@"Player %d didnt jump", _id);
-                return;
-    }
+        return;
     
     CGPoint totalImpulse = CGPointMake(0,0);
     
@@ -87,13 +84,10 @@ static unsigned int idCounter;
         dir.x /= len;
         dir.y /= len;
 
-        float angleNoiseRange = 30 * M_PI/180;
-        float angleNoise = ((double)arc4random() / ARC4RANDOM_MAX) * angleNoiseRange - angleNoiseRange/2;
+        float angleNoise = randomInRangef(-angleNoise, angleNoise);
         dir = CGPointApplyAffineTransform(dir, CGAffineTransformMakeRotation(angleNoise));
 
-        float impulseValueMax = 7;
-        float impulseValueMin = 6;
-        float impulseValue = ((double)arc4random() / ARC4RANDOM_MAX) * (impulseValueMax - impulseValueMin) + impulseValueMin;
+        float impulseValue = randomInRangef(6, 7);
 
         CGPoint impulse = CGPointMake(dir.x*impulseValue, dir.y*impulseValue);
         totalImpulse.x += impulse.x;
@@ -102,13 +96,11 @@ static unsigned int idCounter;
 
     // Impulse into direction of player orientation
     {
-        float angleNoiseRange = 0 * M_PI/180;
-        float angleNoise = ((double)arc4random() / ARC4RANDOM_MAX) * angleNoiseRange - angleNoiseRange/2;
+        float angleNoiseRange = 1 * M_PI/180;
+        float angleNoise = randomInRangef(-angleNoiseRange, angleNoiseRange);
         float angle = self.chestBody->GetAngle()+angleNoise;
 
-        float impulseValueMax = 7;
-        float impulseValueMin = 5;
-        float impulseValue = ((double)arc4random() / ARC4RANDOM_MAX) * (impulseValueMax - impulseValueMin) + impulseValueMin;
+        float impulseValue = randomInRangef(5,7);
         
         CGPoint impulse = CGPointApplyAffineTransform(CGPointMake(0, impulseValue), CGAffineTransformMakeRotation(angle));
         totalImpulse.x += impulse.x;
@@ -139,12 +131,12 @@ static unsigned int idCounter;
                                              fixedRotation:NO
                                              withBox2DNode:self.box2DNode];
     
-    self.legA = [CCSprite spriteWithImageNamed:team==TeamB ? btn_menu_1_player_pushed : btn_menu_2_player_pushed ];
-    self.legA.scaleX = leg_a_size.width/self.legA.contentSize.width;
-    self.legA.scaleY = leg_a_size.height/self.legA.contentSize.height;
+    CCSprite *legA = [CCSprite spriteWithImageNamed:team==TeamB ? btn_menu_1_player_pushed : btn_menu_2_player_pushed ];
+    legA.scaleX = leg_a_size.width/legA.contentSize.width;
+    legA.scaleY = leg_a_size.height/legA.contentSize.height;
     
-    leg_a_body->SetUserData((__bridge void *)_legA);
-    [self.box2DNode addChild:self.legA];
+    leg_a_body->SetUserData((__bridge void *)legA);
+    [self.box2DNode addChild:legA];
 
     CGSize leg_b_size = CGSizeMake(w*0.55/2, h*0.45);
     CGPoint leg_b_pos = CGPointMake(position.x + leg_b_size.width/2, position.y + leg_b_size.height/2);
@@ -155,33 +147,31 @@ static unsigned int idCounter;
                                              fixedRotation:NO
                                              withBox2DNode:self.box2DNode];
     
-    self.legB = [CCSprite spriteWithImageNamed:team==TeamB ? btn_menu_1_player_pushed : btn_menu_2_player_pushed];
-    self.legB.scaleX = leg_b_size.width/self.legB.contentSize.width;
-    self.legB.scaleY = leg_b_size.height/self.legB.contentSize.height;
+    CCSprite *legB = [CCSprite spriteWithImageNamed:team==TeamB ? btn_menu_1_player_pushed : btn_menu_2_player_pushed];
+    legB.scaleX = leg_b_size.width/legB.contentSize.width;
+    legB.scaleY = leg_b_size.height/legB.contentSize.height;
 
-    leg_b_body->SetUserData((__bridge void *)_legB);
-    [self.box2DNode addChild:self.legB];
+    leg_b_body->SetUserData((__bridge void *)legB);
+    [self.box2DNode addChild:legB];
 
     //////////////////////////////////////////////////////////////////////////////
     // Chest
     
     CGSize chest_size = CGSizeMake(w*0.55, h*0.35);
     CGPoint chest_pos = CGPointMake(position.x, position.y + leg_a_size.height + chest_size.height/2);
-    b2Body *chest_body = [PhysicsFactory createBoxWithSize:chest_size
+    self.chestBody = [PhysicsFactory createBoxWithSize:chest_size
                                                   position:chest_pos
                                                      angle:0
                                              fixedRotation:NO
                                              withBox2DNode:self.box2DNode];
     
 
-    self.chest = [CCSprite spriteWithImageNamed:team==TeamB ? btn_menu_1_player_pushed : btn_menu_2_player_pushed];
-    self.chest.scaleX = chest_size.width/self.chest.contentSize.width;
-    self.chest.scaleY = chest_size.height/self.chest.contentSize.height;
+    CCSprite *chest = [CCSprite spriteWithImageNamed:team==TeamB ? btn_menu_1_player_pushed : btn_menu_2_player_pushed];
+    chest.scaleX = chest_size.width/chest.contentSize.width;
+    chest.scaleY = chest_size.height/chest.contentSize.height;
     
-    chest_body->SetUserData((__bridge void *)_chest);
-    self.chestBody = chest_body;
-    
-    [self.box2DNode addChild:self.chest];
+    self.chestBody->SetUserData((__bridge void *)chest);
+    [self.box2DNode addChild:chest];
     
     //////////////////////////////////////////////////////////////////////////////
     // Head
@@ -195,13 +185,12 @@ static unsigned int idCounter;
                                             fixedRotation:NO
                                             withBox2DNode:self.box2DNode];
     
-    self.head = [CCSprite spriteWithImageNamed:team==TeamB ? btn_menu_1_player_normal : btn_menu_2_player_normal];
-    self.head.scaleX = head_size.width/self.head.contentSize.width;
-    self.head.scaleY = head_size.height/self.head.contentSize.height;
+    CCSprite *head = [CCSprite spriteWithImageNamed:team==TeamB ? btn_menu_1_player_normal : btn_menu_2_player_normal];
+    head.scaleX = head_size.width/head.contentSize.width;
+    head.scaleY = head_size.height/head.contentSize.height;
     
-    head_body->SetUserData((__bridge void *)_head);
-    
-    [self.box2DNode addChild:self.head];
+    head_body->SetUserData((__bridge void *)head);
+    [self.box2DNode addChild:head];
 
     //////////////////////////////////////////////////////////////////////////////
     // Weight
@@ -225,7 +214,7 @@ static unsigned int idCounter;
     head_chest_joint_opts[@"lowerAngle"] = [NSNumber numberWithFloat:-7 *M_PI/180];
     head_chest_joint_opts[@"upperAngle"] = [NSNumber numberWithFloat:7 *M_PI/180];
     [PhysicsFactory createRevoluteJointBetweenBodyA:head_body
-                                           andBodyB:chest_body
+                                           andBodyB:self.chestBody
                                       atWorldAnchor:head_chest_anchor
                                         withOptions:head_chest_joint_opts
                                       withBox2DNode:self.box2DNode];
@@ -239,7 +228,7 @@ static unsigned int idCounter;
     leg_a_chest_joint_opts[@"enableMotor"] = [NSNumber numberWithBool:YES];
     leg_a_chest_joint_opts[@"maxMotorTorque"] = [NSNumber numberWithFloat:10];
     self.legAJoint = [PhysicsFactory createRevoluteJointBetweenBodyA:leg_a_body
-                                                            andBodyB:chest_body
+                                                            andBodyB:self.chestBody
                                                        atWorldAnchor:leg_a_chest_anchor
                                                          withOptions:leg_a_chest_joint_opts
                                                        withBox2DNode:self.box2DNode];
@@ -253,7 +242,7 @@ static unsigned int idCounter;
     leg_b_chest_joint_opts[@"enableMotor"] = [NSNumber numberWithBool:YES];
     leg_b_chest_joint_opts[@"maxMotorTorque"] = [NSNumber numberWithFloat:10];
     self.legBJoint = [PhysicsFactory createRevoluteJointBetweenBodyA:leg_b_body
-                                                            andBodyB:chest_body
+                                                            andBodyB:self.chestBody
                                                        atWorldAnchor:leg_b_chest_anchor
                                                          withOptions:leg_b_chest_joint_opts
                                                        withBox2DNode:self.box2DNode];
@@ -261,7 +250,7 @@ static unsigned int idCounter;
     // weight - chest
     CGPoint weight_chest_anchor = CGPointMake(position.x, position.y);
     NSMutableDictionary *weight_chest_joint_opts = [PhysicsFactory getDefaultRevoluteJointOptions];
-    [PhysicsFactory createRevoluteJointBetweenBodyA:chest_body
+    [PhysicsFactory createRevoluteJointBetweenBodyA:self.chestBody
                                            andBodyB:self.weightBody
                                       atWorldAnchor:weight_chest_anchor
                                         withOptions:weight_chest_joint_opts
@@ -286,7 +275,7 @@ static unsigned int idCounter;
     filter.categoryBits = 0x01 << FILTER_HEAD_AND_CHEST;
     filter.maskBits = ~(0x00);     // collide with all
     [PhysicsFactory setBody:head_body filterData:filter];
-    [PhysicsFactory setBody:chest_body filterData:filter];
+    [PhysicsFactory setBody:self.chestBody filterData:filter];
 
     // legs
     filter.groupIndex = -_id;

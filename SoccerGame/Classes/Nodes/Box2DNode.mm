@@ -16,9 +16,7 @@
     if (self=[super init])
     {
         self.slowRate = 1;
-        
         self.world = new b2World(gravity);
-        self.actors = [NSMutableArray arrayWithArray:@[]];
     }
     
     return self;
@@ -42,22 +40,13 @@
             node.rotation = -angle*180/M_PI;
         }
     }
-    
-    for(Actor *actor in self.actors)
-        [actor logic];
 }
 
 - (void)dealloc {
-    [self.actors removeAllObjects];
-    
     for(b2Body* b=self.world->GetBodyList(); b; b=b->GetNext())
         self.world->DestroyBody(b);
     
     delete self.world;
-}
-
-- (void)addActor:(Actor*)actor {
-    [self.actors addObject:actor];
 }
 
 @end

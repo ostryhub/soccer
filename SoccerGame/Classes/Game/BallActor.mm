@@ -17,6 +17,7 @@
 - (id)initWithPosition:(CGPoint)position radius:(float)radius andBox2DNode:(Box2DNode *)box2DNode {
     if (self=[super init])
     {
+        self.state = BallState_Play;
         self.box2DNode = box2DNode;
         [self createBallAtPosition:position andRadius:radius];
     }
@@ -40,5 +41,14 @@
 - (CGPoint)getPosition {
     return CGPointMake(self.ballBody->GetPosition().x, self.ballBody->GetPosition().y);
 };
+
+- (void)logic {
+    CGPoint p = [self getPosition];
+    
+    self.state =    (p.x<1.7 && p.x>0.5 && p.y<4.25)    ? BallState_InsideGoalA :
+                    (p.x>8.3 && p.x<9.5 && p.y<4.25)    ? BallState_InsideGoalB :
+                    (p.x<0 || p.x>10)                   ? BallState_Out:
+                                                          BallState_Play;
+}
 
 @end

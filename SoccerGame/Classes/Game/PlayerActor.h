@@ -12,25 +12,21 @@
 #import "Box2DNode.h"
 
 typedef enum _Team : NSUInteger {
-    TeamA,  // left
-    TeamB   // right
+    TeamA,  // left RED
+    TeamB   // right BLUE
 } Team;
 
 @interface PlayerActor : Actor
 
 @property (strong, nonatomic) Box2DNode *box2DNode;
-@property (strong, nonatomic) CCSprite *head;
-@property (strong, nonatomic) CCSprite *chest;
-@property (strong, nonatomic) CCSprite *legA;
-@property (strong, nonatomic) CCSprite *legB;
 
 @property (nonatomic) b2RevoluteJoint *legAJoint;
 @property (nonatomic) b2RevoluteJoint *legBJoint;
 @property (nonatomic) b2DistanceJoint *standJoint;
 @property (nonatomic) b2Body *weightBody;
 @property (nonatomic) b2Body *chestBody;
-@property (nonatomic) Team team;
 
+@property (nonatomic) Team team;
 @property (nonatomic) BOOL jumpingEnabled;
 
 - (id)initWithPosition:(CGPoint)position size:(CGSize)size team:(Team)team andBox2DNode:(Box2DNode *)box2DNode;

@@ -855,6 +855,7 @@
 		8452C31419DBEB7900F39B50 /* TeamAI.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TeamAI.mm; path = Classes/Game/TeamAI.mm; sourceTree = "<group>"; };
 		8452C31619DC00E200F39B50 /* Button_2Player_down.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Button_2Player_down.png; sourceTree = "<group>"; };
 		8452C31719DC00E200F39B50 /* Button_2Player_up.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Button_2Player_up.png; sourceTree = "<group>"; };
+		8452C31A19DC217F00F39B50 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = Classes/Game/Utils.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1314,6 +1315,7 @@
 			children = (
 				8452C2F919D9C24200F39B50 /* Game */,
 				8452C2F219D9BEC900F39B50 /* Nodes */,
+				8452C31A19DC217F00F39B50 /* Utils.h */,
 				8452C25A19D9B2A500F39B50 /* Strings.h */,
 				8452BE1C19D9A32D00F39B50 /* GameScene.h */,
 				8452BE1D19D9A32D00F39B50 /* GameScene.mm */,
@@ -2204,7 +2206,6 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -2224,7 +2225,6 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -2281,12 +2281,14 @@
 					"\"$(SRCROOT)/$(PROJECT_NAME)/Libraries\"",
 				);
 				INFOPLIST_FILE = SoccerGame/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-lsqlite3",
 					"-ObjC",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2307,12 +2309,14 @@
 					"\"$(SRCROOT)/$(PROJECT_NAME)/Libraries\"",
 				);
 				INFOPLIST_FILE = SoccerGame/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-lsqlite3",
 					"-ObjC",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};

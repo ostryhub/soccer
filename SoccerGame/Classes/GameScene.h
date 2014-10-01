@@ -46,8 +46,10 @@ typedef enum _GameState {
 @property (strong, nonatomic) PlayerActor *playerKeeperB;
 @property (strong, nonatomic) PlayerActor *playerStrikerB;
 
+@property (strong, nonatomic) NSArray *actors;  // Actors array holds all actors and is used to update their logic during scene update
+
 // AI
-@property (strong, nonatomic) TeamAI *teamAI;
+@property (strong, nonatomic) TeamAI *teamAI;   // Instance responsible for managing CPU gameplay
 
 // Score
 @property (nonatomic) int scoreTeamA;
