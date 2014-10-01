@@ -84,7 +84,8 @@ static unsigned int idCounter;
         dir.x /= len;
         dir.y /= len;
 
-        float angleNoise = randomInRangef(-angleNoise, angleNoise);
+        float angleNoiseRange = 20 * M_PI/180;
+        float angleNoise = randomInRangef(-angleNoiseRange, angleNoiseRange);
         dir = CGPointApplyAffineTransform(dir, CGAffineTransformMakeRotation(angleNoise));
 
         float impulseValue = randomInRangef(6, 7);
