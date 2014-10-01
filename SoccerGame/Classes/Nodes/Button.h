@@ -10,7 +10,6 @@
 
 @interface Button : CCButton
 
-
 - (void)setTouchBeganTarget:(id)target selector:(SEL)selector;
 - (void)setTouchEndedTarget:(id)target selector:(SEL)selector;
 

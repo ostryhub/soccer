@@ -282,6 +282,9 @@
 		8452C30719DAC25600F39B50 /* BallActor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8452C30619DAC25600F39B50 /* BallActor.mm */; };
 		8452C30D19DAEF0D00F39B50 /* Button.m in Sources */ = {isa = PBXBuildFile; fileRef = 8452C30C19DAEF0D00F39B50 /* Button.m */; };
 		8452C31219DB2C0000F39B50 /* Goal.png in Resources */ = {isa = PBXBuildFile; fileRef = 8452C31119DB2C0000F39B50 /* Goal.png */; };
+		8452C31519DBEB7900F39B50 /* TeamAI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8452C31419DBEB7900F39B50 /* TeamAI.mm */; };
+		8452C31819DC00E200F39B50 /* Button_2Player_down.png in Resources */ = {isa = PBXBuildFile; fileRef = 8452C31619DC00E200F39B50 /* Button_2Player_down.png */; };
+		8452C31919DC00E200F39B50 /* Button_2Player_up.png in Resources */ = {isa = PBXBuildFile; fileRef = 8452C31719DC00E200F39B50 /* Button_2Player_up.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -848,6 +851,10 @@
 		8452C30B19DAEF0D00F39B50 /* Button.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Button.h; path = Classes/Nodes/Button.h; sourceTree = "<group>"; };
 		8452C30C19DAEF0D00F39B50 /* Button.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Button.m; path = Classes/Nodes/Button.m; sourceTree = "<group>"; };
 		8452C31119DB2C0000F39B50 /* Goal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Goal.png; sourceTree = "<group>"; };
+		8452C31319DBEB7900F39B50 /* TeamAI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TeamAI.h; path = Classes/Game/TeamAI.h; sourceTree = "<group>"; };
+		8452C31419DBEB7900F39B50 /* TeamAI.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TeamAI.mm; path = Classes/Game/TeamAI.mm; sourceTree = "<group>"; };
+		8452C31619DC00E200F39B50 /* Button_2Player_down.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Button_2Player_down.png; sourceTree = "<group>"; };
+		8452C31719DC00E200F39B50 /* Button_2Player_up.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Button_2Player_up.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1621,6 +1628,8 @@
 				8452C2FA19D9CAF900F39B50 /* ball_soccer.png */,
 				8452C25819D9B22700F39B50 /* Button_1Player_down.png */,
 				8452C25619D9B16E00F39B50 /* Button_1Player_up.png */,
+				8452C31619DC00E200F39B50 /* Button_2Player_down.png */,
+				8452C31719DC00E200F39B50 /* Button_2Player_up.png */,
 			);
 			name = images;
 			path = Resources/images;
@@ -1807,6 +1816,8 @@
 				8452C30319DA10C000F39B50 /* Actor.m */,
 				8452C30519DAC25600F39B50 /* BallActor.h */,
 				8452C30619DAC25600F39B50 /* BallActor.mm */,
+				8452C31319DBEB7900F39B50 /* TeamAI.h */,
+				8452C31419DBEB7900F39B50 /* TeamAI.mm */,
 			);
 			name = Game;
 			sourceTree = "<group>";
@@ -1885,6 +1896,7 @@
 				8452BDA519D9A32D00F39B50 /* LICENSE_CCBReader.txt in Resources */,
 				8452C2C319D9B65B00F39B50 /* CMakeLists.txt in Resources */,
 				8452BB9719D9A32A00F39B50 /* Icon@2x.png in Resources */,
+				8452C31919DC00E200F39B50 /* Button_2Player_up.png in Resources */,
 				8452BBA919D9A32A00F39B50 /* Icon-Small@2x.png in Resources */,
 				8452BB9B19D9A32A00F39B50 /* Icon-72@2x.png in Resources */,
 				8452BB8C19D9A32A00F39B50 /* Default.png in Resources */,
@@ -1901,6 +1913,7 @@
 				8452BCE719D9A32C00F39B50 /* LICENSE_cocos2d.txt in Resources */,
 				8452BB9019D9A32A00F39B50 /* Default-568h@2x.png in Resources */,
 				8452BBB019D9A32B00F39B50 /* iTunesArtwork in Resources */,
+				8452C31819DC00E200F39B50 /* Button_2Player_down.png in Resources */,
 				8452BBAB19D9A32A00F39B50 /* Icon-Spotlight-iOS7.png in Resources */,
 				8452BB9F19D9A32A00F39B50 /* Icon-76@2x.png in Resources */,
 				8452BE1319D9A32D00F39B50 /* LICENSE_Chipmunk.txt in Resources */,
@@ -1997,6 +2010,7 @@
 				8452BCFA19D9A32C00F39B50 /* OALAudioTrack.m in Sources */,
 				8452BD8019D9A32D00F39B50 /* plane.c in Sources */,
 				8452C30719DAC25600F39B50 /* BallActor.mm in Sources */,
+				8452C31519DBEB7900F39B50 /* TeamAI.mm in Sources */,
 				8452C24419D9A80E00F39B50 /* CCAnimationManager.m in Sources */,
 				8452C21C19D9A80E00F39B50 /* CCResponder.m in Sources */,
 				8452C1EB19D9A80E00F39B50 /* CCActionInstant.m in Sources */,

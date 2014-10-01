@@ -13,6 +13,5 @@
 @interface Actor : NSObject
 
 - (void)logic;
-- (void)destroy;
 
 @end

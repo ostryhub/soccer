@@ -20,6 +20,8 @@
 #import "BallActor.h"
 #import "PlayerActor.h"
 
+#import "TeamAI.h"
+
 #pragma mark - GameScene
 
 @implementation GameScene
@@ -43,6 +45,13 @@
     // Create a colored background
     CCNodeColor *background = [CCNodeColor nodeWithColor:[CCColor colorWithRed:0.2f green:0.7f blue:0.2f alpha:1.0f]];
     [self addChild:background];
+    
+    // Score label
+    self.labelScore = [CCLabelTTF labelWithString:[self getScoreText] fontName:@"ArialBlack" fontSize:60.0f];
+    self.labelScore.positionType = CCPositionTypeNormalized;
+    self.labelScore.color = [CCColor whiteColor];
+    self.labelScore.position = ccp(0.5f, 0.8f);
+    [self addChild:self.labelScore];
     
     // Start match
     [self startNewMatch];
@@ -88,12 +97,9 @@
     if (self.ball)
         [self.ball.ball.parent removeChild:self.ball.ball];
     
-    // Physics Soccer
-    CCLabelTTF *labelScore = [CCLabelTTF labelWithString:[self getScoreText] fontName:@"ArialBlack" fontSize:40.0f];
-    labelScore.positionType = CCPositionTypeNormalized;
-    labelScore.color = [CCColor whiteColor];
-    labelScore.position = ccp(0.5f, 0.8f);
-    [self addChild:labelScore];
+    self.teamAI = nil;
+    
+    [self.labelScore setString:[self getScoreText]];
     
     // Cocos2d "display values"
     CGSize viewSize = [[CCDirector sharedDirector] viewSizeInPixels];
@@ -113,7 +119,7 @@
     [PhysicsFactory createGroundBoxWithSize:CGSizeMake(30,0.5) andPosition:CGPointMake(5,1) withBox2DNode:self.box2DNode];
     
     // Init Ball
-    self.ball = [[BallActor alloc] initWithPosition:CGPointMake(5,7) radius:0.25f andBox2DNode:self.box2DNode];
+    self.ball = [[BallActor alloc] initWithPosition:CGPointMake(5,5) radius:0.25f andBox2DNode:self.box2DNode];
     
     // Init Players
     static CGSize playerSize = CGSizeMake(.8,1.6);
@@ -142,8 +148,6 @@
     goalB.scaleY = 3.0/goalA.contentSize.height;
     goalB.position = CGPointMake(8.85,2.75);
     [self.box2DNode addChild:goalB];
-    [PhysicsFactory createGroundBoxWithSize:CGSizeMake(0.1,3) andPosition:CGPointMake(0.55, 2.75) withBox2DNode:self.box2DNode];
-    [PhysicsFactory createGroundBoxWithSize:CGSizeMake(1.3,0.1) andPosition:CGPointMake(1.15, 4.2) withBox2DNode:self.box2DNode];
 
     // Add actors to box2DNode so that they can be prompted to update their logic
     [self.box2DNode addActor:self.ball];
@@ -151,6 +155,9 @@
     [self.box2DNode addActor:self.playerStrikerA];
     [self.box2DNode addActor:self.playerKeeperB];
     [self.box2DNode addActor:self.playerStrikerB];
+    
+    // Create AI for tema A
+    self.teamAI = [[TeamAI alloc] initWithPlayers:@[self.playerKeeperA, self.playerStrikerA]];
 }
 
 - (void)goal {
@@ -228,6 +235,8 @@
     switch(self.gameState)
     {
         case GameState_Play:
+
+            // Ball checks
             if (self.ball)
             {
                 CGPoint p = self.ball.ball.position;
@@ -249,6 +258,10 @@
                     [self ballOut];
                 }
             }
+
+            // TeamA AI
+            [self.teamAI performAIwithDelta:delta andBallPosition:self.ball.ball.position];
+            
             break;
             
         default:
@@ -295,12 +308,6 @@
 
 - (void)onKickBegan:(id)sender
 {
-    [self.playerStrikerA jumpInDirection:[self.ball getPosition]];
-    [self.playerKeeperA jumpInDirection:[self.ball getPosition]];
-    
-    [self.playerStrikerA startKick];
-    [self.playerKeeperA startKick];
-    
     [self.playerStrikerB jumpInDirection:[self.ball getPosition]];
     [self.playerKeeperB jumpInDirection:[self.ball getPosition]];
 
@@ -310,9 +317,6 @@
 
 - (void)onKickEnded:(id)sender
 {
-    [self.playerStrikerA stopKick];
-    [self.playerKeeperA stopKick];
-    
     [self.playerStrikerB stopKick];
     [self.playerKeeperB stopKick];
 }

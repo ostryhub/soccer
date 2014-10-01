@@ -9,10 +9,15 @@
 #ifndef SoccerGame_Strings_h
 #define SoccerGame_Strings_h
 
+#define ARC4RANDOM_MAX 0x100000000
+
 #pragma mark - Menu
 
 static NSString *btn_menu_1_player_normal = @"Button_1Player_up.png";
 static NSString *btn_menu_1_player_pushed = @"Button_1Player_down.png";
+
+static NSString *btn_menu_2_player_normal = @"Button_2Player_up.png";
+static NSString *btn_menu_2_player_pushed = @"Button_2Player_down.png";
 
 #pragma mark - Gameplay
 

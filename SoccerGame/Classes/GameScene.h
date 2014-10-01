@@ -16,6 +16,7 @@
 @class BallActor;
 @class PlayerActor;
 @class Box2DNode;
+@class TeamAI;
 
 typedef enum _GameState {
     GameState_Play,
@@ -34,6 +35,7 @@ typedef enum _GameState {
 // Nodes
 @property (strong, nonatomic) Box2DNode *box2DNode;
 @property (strong, nonatomic) CCNode *goalNode;
+@property (strong, nonatomic) CCLabelTTF *labelScore;
 
 // Actors
 @property (strong, nonatomic) BallActor *ball;
@@ -43,6 +45,9 @@ typedef enum _GameState {
 
 @property (strong, nonatomic) PlayerActor *playerKeeperB;
 @property (strong, nonatomic) PlayerActor *playerStrikerB;
+
+// AI
+@property (strong, nonatomic) TeamAI *teamAI;
 
 // Score
 @property (nonatomic) int scoreTeamA;

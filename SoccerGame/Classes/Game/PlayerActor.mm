@@ -11,7 +11,6 @@
 #import "Box2D.h"
 #import "Strings.h"
 
-#define ARC4RANDOM_MAX 0x100000000
 
 const static float _standUpFrequency = 2.0f;
 const static float _standUpDamping = 1.0f;
@@ -27,9 +26,9 @@ static unsigned int idCounter;
     {
         _id = ++idCounter;
         self.box2DNode = box2DNode;
+        self.team = team;
         [self createRagdollAtPosition:position size:size forTeam:team];
         self.jumpingEnabled = YES;
-        self.team = team;
     }
     return self;
 }
@@ -39,8 +38,6 @@ static unsigned int idCounter;
     
     self.jumpingEnabled = self.chestBody->GetPosition().y<=2.5;
 }
-
-- (void)destroy {}
 
 - (void)startKick {
     switch(self.team)
@@ -62,11 +59,9 @@ static unsigned int idCounter;
 
 - (void)stopKick {
     self.legAJoint->EnableMotor(true);
-    self.legAJoint->SetMaxMotorTorque(10);
     self.legAJoint->SetMotorSpeed(10);
     
     self.legBJoint->EnableMotor(true);
-    self.legBJoint->SetMaxMotorTorque(10);
     self.legBJoint->SetMotorSpeed(-10);
     
     self.standJoint->SetFrequency(_standUpFrequency);
@@ -96,7 +91,7 @@ static unsigned int idCounter;
         float angleNoise = ((double)arc4random() / ARC4RANDOM_MAX) * angleNoiseRange - angleNoiseRange/2;
         dir = CGPointApplyAffineTransform(dir, CGAffineTransformMakeRotation(angleNoise));
 
-        float impulseValueMax = 9;
+        float impulseValueMax = 7;
         float impulseValueMin = 6;
         float impulseValue = ((double)arc4random() / ARC4RANDOM_MAX) * (impulseValueMax - impulseValueMin) + impulseValueMin;
 
@@ -144,10 +139,9 @@ static unsigned int idCounter;
                                              fixedRotation:NO
                                              withBox2DNode:self.box2DNode];
     
-    self.legA = [CCSprite spriteWithImageNamed:btn_menu_1_player_pushed];
+    self.legA = [CCSprite spriteWithImageNamed:team==TeamB ? btn_menu_1_player_pushed : btn_menu_2_player_pushed ];
     self.legA.scaleX = leg_a_size.width/self.legA.contentSize.width;
     self.legA.scaleY = leg_a_size.height/self.legA.contentSize.height;
-    self.legA.opacity = 0.5f;
     
     leg_a_body->SetUserData((__bridge void *)_legA);
     [self.box2DNode addChild:self.legA];
@@ -161,7 +155,7 @@ static unsigned int idCounter;
                                              fixedRotation:NO
                                              withBox2DNode:self.box2DNode];
     
-    self.legB = [CCSprite spriteWithImageNamed:btn_menu_1_player_pushed];
+    self.legB = [CCSprite spriteWithImageNamed:team==TeamB ? btn_menu_1_player_pushed : btn_menu_2_player_pushed];
     self.legB.scaleX = leg_b_size.width/self.legB.contentSize.width;
     self.legB.scaleY = leg_b_size.height/self.legB.contentSize.height;
 
@@ -180,7 +174,7 @@ static unsigned int idCounter;
                                              withBox2DNode:self.box2DNode];
     
 
-    self.chest = [CCSprite spriteWithImageNamed:btn_menu_1_player_pushed];
+    self.chest = [CCSprite spriteWithImageNamed:team==TeamB ? btn_menu_1_player_pushed : btn_menu_2_player_pushed];
     self.chest.scaleX = chest_size.width/self.chest.contentSize.width;
     self.chest.scaleY = chest_size.height/self.chest.contentSize.height;
     
@@ -201,7 +195,7 @@ static unsigned int idCounter;
                                             fixedRotation:NO
                                             withBox2DNode:self.box2DNode];
     
-    self.head = [CCSprite spriteWithImageNamed:btn_menu_1_player_normal];
+    self.head = [CCSprite spriteWithImageNamed:team==TeamB ? btn_menu_1_player_normal : btn_menu_2_player_normal];
     self.head.scaleX = head_size.width/self.head.contentSize.width;
     self.head.scaleY = head_size.height/self.head.contentSize.height;
     
@@ -273,6 +267,7 @@ static unsigned int idCounter;
                                         withOptions:weight_chest_joint_opts
                                       withBox2DNode:self.box2DNode];
 
+    // Joint keeping player vertical
     b2DistanceJointDef jointDef;
     b2Vec2 jointPos(position.x + (self.team==TeamA?1:-1)*w, position.y+h*3);
     jointDef.Initialize(self.chestBody, self.weightBody, b2Vec2(chest_pos.x, chest_pos.y), jointPos);
