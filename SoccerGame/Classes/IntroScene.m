@@ -65,8 +65,22 @@
     
     btn_player_1.positionType = CCPositionTypeNormalized;
     btn_player_1.position = ccp(0.4f, 0.25f);
-    [btn_player_1 setTarget:self selector:@selector(onSpinningClicked:)];
+    [btn_player_1 setTarget:self selector:@selector(onOnePlayerGameClicked:)];
     [self addChild:btn_player_1];
+
+    // twoPlayerButton scene button
+    CCSpriteFrame *btn_2player_up = [CCSpriteFrame frameWithImageNamed: btn_menu_2_player_normal ];
+    CCSpriteFrame *btn_2player_down = [CCSpriteFrame frameWithImageNamed: btn_menu_2_player_pushed];
+    CCButton *btn_player_2 = [CCButton buttonWithTitle:@""
+                                           spriteFrame:btn_2player_up
+                                highlightedSpriteFrame:btn_2player_down
+                                   disabledSpriteFrame:btn_2player_up];
+    
+    btn_player_2.positionType = CCPositionTypeNormalized;
+    btn_player_2.position = ccp(0.6f, 0.25f);
+    [btn_player_2 setTarget:self selector:@selector(onTwoPlayerGameClicked:)];
+    [self addChild:btn_player_2];
+
 
     // done
 	return self;
@@ -76,12 +90,20 @@
 #pragma mark - Button Callbacks
 // -----------------------------------------------------------------------
 
-- (void)onSpinningClicked:(id)sender
+- (void)onOnePlayerGameClicked:(id)sender
 {
     // start spinning scene with transition
-    [[CCDirector sharedDirector] replaceScene:[GameScene scene]
+    [[CCDirector sharedDirector] replaceScene:[GameScene sceneWithMode:GameMode_OnePlayer]
                                withTransition:[CCTransition transitionPushWithDirection:CCTransitionDirectionLeft duration:0.2f]];
 }
+
+- (void)onTwoPlayerGameClicked:(id)sender
+{
+    // start spinning scene with transition
+    [[CCDirector sharedDirector] replaceScene:[GameScene sceneWithMode:GameMode_TwoPlayers]
+                               withTransition:[CCTransition transitionPushWithDirection:CCTransitionDirectionLeft duration:0.2f]];
+}
+
 
 // -----------------------------------------------------------------------
 @end

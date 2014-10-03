@@ -28,13 +28,21 @@
 
 + (GameScene *)scene
 {
-    return [[self alloc] init];
+    return [[self alloc] initWithMode:GameMode_OnePlayer];
+}
+
++ (GameScene *)sceneWithMode:(GameMode)mode
+{
+    return [[self alloc] initWithMode:mode];
 }
 
 // -----------------------------------------------------------------------
 
-- (id)init
+- (id)initWithMode:(GameMode)mode
 {
+    self.multipleTouchEnabled = YES;
+    self.gameMode = mode;
+    
     // Apple recommend assigning self with supers return value
     self = [super init];
     if (!self) return(nil);
@@ -70,9 +78,29 @@
     
     kickButton.positionType = CCPositionTypeNormalized;
     kickButton.position = ccp(0.9f, 0.1f);
-    [kickButton setTouchBeganTarget:self selector:@selector(onKickBegan:)];
-    [kickButton setTouchEndedTarget:self selector:@selector(onKickEnded:)];
+    [kickButton setTouchBeganTarget:self selector:@selector(onKickBeganTeamB:)];
+    [kickButton setTouchEndedTarget:self selector:@selector(onKickEndedTeamB:)];
+    kickButton.exclusiveTouch = NO;
     [self addChild:kickButton];
+    kickButton.multipleTouchEnabled = YES;
+    
+    if (self.gameMode==GameMode_TwoPlayers)
+    {
+        CCSpriteFrame *btn_2player_up = [CCSpriteFrame frameWithImageNamed: btn_menu_2_player_normal ];
+        CCSpriteFrame *btn_2player_down = [CCSpriteFrame frameWithImageNamed: btn_menu_2_player_pushed];
+        Button *kickButton = [Button buttonWithTitle:@""
+                                         spriteFrame:btn_2player_up
+                              highlightedSpriteFrame:btn_2player_down
+                                 disabledSpriteFrame:btn_2player_up];
+        
+        kickButton.positionType = CCPositionTypeNormalized;
+        kickButton.position = ccp(0.1f, 0.1f);
+        [kickButton setTouchBeganTarget:self selector:@selector(onKickBeganTeamA:)];
+        [kickButton setTouchEndedTarget:self selector:@selector(onKickEndedTeamA:)];
+        kickButton.exclusiveTouch = NO;
+        [self addChild:kickButton];
+        kickButton.multipleTouchEnabled = YES;
+    }
 
     // Start match
     [self startNewMatch];
@@ -107,6 +135,7 @@
     self.box2DNode = [[Box2DNode alloc] initWithGravity:gravity];
     self.box2DNode.scale = viewScale;
     [self addChild:self.box2DNode];
+    self.box2DNode.multipleTouchEnabled = YES;
     
     // Init Ball
     self.ball = [[BallActor alloc] initWithPosition:CGPointMake(5,5) radius:0.25f andBox2DNode:self.box2DNode];
@@ -121,8 +150,11 @@
     // Add actors to box2DNode so that they can be prompted to update their logic
     self.actors = @[self.ball, self.playerKeeperA, self.playerStrikerA, self.playerKeeperB, self.playerStrikerB];
     
-    // Create AI for tema A
-    self.teamAI = [[TeamAI alloc] initWithPlayers:@[self.playerKeeperA, self.playerStrikerA]];
+    if (self.gameMode==GameMode_OnePlayer)
+    {
+        // Create AI for tema A
+        self.teamAI = [[TeamAI alloc] initWithPlayers:@[self.playerKeeperA, self.playerStrikerA]];
+    }
 
     // Uncomment this line if you want to see CPU competing with itself
     //self.teamAI = [[TeamAI alloc] initWithPlayers:@[self.playerKeeperA, self.playerStrikerA, self.playerKeeperB, self.playerStrikerB]];
@@ -281,7 +313,7 @@
                                withTransition:[CCTransition transitionPushWithDirection:CCTransitionDirectionRight duration:0.2f]];
 }
 
-- (void)onKickBegan:(id)sender
+- (void)onKickBeganTeamB:(id)sender
 {
     [self.playerStrikerB jumpInDirection:[self.ball getPosition]];
     [self.playerKeeperB jumpInDirection:[self.ball getPosition]];
@@ -290,11 +322,27 @@
     [self.playerKeeperB startKick];
 }
 
-- (void)onKickEnded:(id)sender
+- (void)onKickEndedTeamB:(id)sender
 {
     [self.playerStrikerB stopKick];
     [self.playerKeeperB stopKick];
 }
+
+- (void)onKickBeganTeamA:(id)sender
+{
+    [self.playerStrikerA jumpInDirection:[self.ball getPosition]];
+    [self.playerKeeperA jumpInDirection:[self.ball getPosition]];
+    
+    [self.playerStrikerA startKick];
+    [self.playerKeeperA startKick];
+}
+
+- (void)onKickEndedTeamA:(id)sender
+{
+    [self.playerStrikerA stopKick];
+    [self.playerKeeperA stopKick];
+}
+
 
 - (void)onNextMatch {
     [self removeChild:self.goalNode];

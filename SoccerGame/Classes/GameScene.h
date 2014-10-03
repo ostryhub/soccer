@@ -24,6 +24,11 @@ typedef enum _GameState {
     GameState_BallOut
 } GameState;
 
+typedef enum _GameMode {
+    GameMode_OnePlayer,
+    GameMode_TwoPlayers
+} GameMode;
+
 /**
  *  The main scene
  */
@@ -31,6 +36,7 @@ typedef enum _GameState {
 
 // GameState
 @property (nonatomic) GameState gameState;
+@property (nonatomic) GameMode gameMode;
 
 // Nodes
 @property (strong, nonatomic) Box2DNode *box2DNode;
@@ -58,7 +64,8 @@ typedef enum _GameState {
 // -----------------------------------------------------------------------
 
 + (GameScene *)scene;
-- (id)init;
++ (GameScene *)sceneWithMode:(GameMode)mode;
+- (id)initWithMode:(GameMode)mode;
 
 - (void)startNewMatch;
 
