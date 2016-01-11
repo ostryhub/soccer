@@ -285,6 +285,7 @@
 		8452C31519DBEB7900F39B50 /* TeamAI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8452C31419DBEB7900F39B50 /* TeamAI.mm */; };
 		8452C31819DC00E200F39B50 /* Button_2Player_down.png in Resources */ = {isa = PBXBuildFile; fileRef = 8452C31619DC00E200F39B50 /* Button_2Player_down.png */; };
 		8452C31919DC00E200F39B50 /* Button_2Player_up.png in Resources */ = {isa = PBXBuildFile; fileRef = 8452C31719DC00E200F39B50 /* Button_2Player_up.png */; };
+		B524F3561C4330E7006C9669 /* goal_new.png in Resources */ = {isa = PBXBuildFile; fileRef = B524F3551C4330E7006C9669 /* goal_new.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -856,6 +857,7 @@
 		8452C31619DC00E200F39B50 /* Button_2Player_down.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Button_2Player_down.png; sourceTree = "<group>"; };
 		8452C31719DC00E200F39B50 /* Button_2Player_up.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Button_2Player_up.png; sourceTree = "<group>"; };
 		8452C31A19DC217F00F39B50 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = Classes/Game/Utils.h; sourceTree = "<group>"; };
+		B524F3551C4330E7006C9669 /* goal_new.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = goal_new.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1626,6 +1628,7 @@
 		8452C25519D9B16E00F39B50 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				B524F3551C4330E7006C9669 /* goal_new.png */,
 				8452C31119DB2C0000F39B50 /* Goal.png */,
 				8452C2FA19D9CAF900F39B50 /* ball_soccer.png */,
 				8452C25819D9B22700F39B50 /* Button_1Player_down.png */,
@@ -1920,6 +1923,7 @@
 				8452BB9F19D9A32A00F39B50 /* Icon-76@2x.png in Resources */,
 				8452BE1319D9A32D00F39B50 /* LICENSE_Chipmunk.txt in Resources */,
 				8452BBAD19D9A32A00F39B50 /* Icon-Spotlight-iOS7@2x.png in Resources */,
+				B524F3561C4330E7006C9669 /* goal_new.png in Resources */,
 				8452BB9D19D9A32A00F39B50 /* Icon-76.png in Resources */,
 				8452BD7319D9A32C00F39B50 /* ChangeLog in Resources */,
 				8452BBB219D9A32B00F39B50 /* iTunesArtwork@2x in Resources */,
