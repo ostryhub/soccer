@@ -31,3 +31,5 @@ Download from Github
 
 
 by Rafał Ostrowski
+
+[![](https://codescene.io/projects/575/status.svg) Get more details at **codescene.io**.](https://codescene.io/projects/575/jobs/latest-successful/results)
